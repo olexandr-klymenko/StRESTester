@@ -1,46 +1,46 @@
-from logging import getLogger
 import asyncio
-import time
 import json
-from typing import Dict, List, ByteString
+import timeit
+from logging import getLogger
+from typing import Dict, List, Union
 from urllib.parse import urljoin
 from urllib.request import urlopen
-
 
 from aiohttp import ClientSession
 from aiohttp.client_exceptions import ClientConnectorError, ClientOSError, ClientResponseError
 
 from constants import SWAGGER_JSON, PATHS, UNKNOWN
+from counter import StatsCounter
 
 __all__ = ['get_swagger', 'async_rest_call', 'parse_scenario_template', 'async_sleep']
-
 
 logger = getLogger('asyncio')
 
 
-def timeit(func):
-    async def process(func, *args, **params):
-        if 'name' in params:
-            print(params['name'])
-        if asyncio.iscoroutinefunction(func):
-            print('this function is a coroutine: {}'.format(func.__name__))
-            return await func(*args, **params)
-        else:
-            print('this is not a coroutine')
-            return func(*args, **params)
-
-    async def helper(*args, **params):
-        print('{}.time'.format(func.__name__))
-        start = time.time()
-        result = await process(func, *args, **params)
-
-        # Test normal function route...
-        # result = await process(lambda *a, **p: print(*a, **p), *args, **params)
-
-        print('>>>', time.time() - start)
+def async_timeit_decorator(coro) -> asyncio.coroutine:
+    async def wrapper(*args, **kwargs):
+        start = timeit.default_timer()
+        print("%s -->" % start)
+        result = await coro(*args, **kwargs)
+        print("--> %s" % timeit.default_timer())
+        action_name = kwargs.get('name', coro.__name__)
+        time_metric = timeit.default_timer() - start
+        StatsCounter.append_time_metric((action_name, time_metric))
+        logger.debug("Action '%s' execution time: %s" % (action_name, time_metric))
         return result
 
-    return helper
+    return wrapper
+
+
+def timeit_decorator(func):
+    def wrapper(*args, **kwargs):
+        start = timeit.default_timer()
+        result = func(*args, **kwargs)
+        action_name = kwargs.get('name', func.__name__)
+        time_metric = timeit.default_timer() - start
+        logger.debug("Action '%s' execution time: %s" % (action_name, time_metric))
+        return result
+    return wrapper
 
 
 def get_swagger(url, swagger_json=SWAGGER_JSON) -> Dict:
@@ -49,43 +49,51 @@ def get_swagger(url, swagger_json=SWAGGER_JSON) -> Dict:
         return swagger
 
 
-# TODO create time decorator to measure execution time
+# TODO fix time decorator
 # TODO investigate global sleep time as Singleton
-# TODO create decorator for collecting errors
 # TODO add doc strings
 
 
-@timeit
-async def async_rest_call(name, method, url, path, swagger, swagger_path,
-                          data=None, params=None, headers=None, raw=False) -> ByteString:
-    if raw:
-        data = json.dumps(data)
+async def async_rest_call(**kwargs) -> Union[str, bytes]:
+    if kwargs.get('raw'):
+        kwargs['data'] = json.dumps(kwargs['data'])
     sleep_time = 1
     while True:
         async with ClientSession() as session:
-            _full_url = urljoin(url, path)
+            _full_url = urljoin(kwargs['url'], kwargs['path'])
             try:
-                async with getattr(session, method)(_full_url, data=data, headers=headers, params=params) as resp:
-                    resp_data = await resp.text()
-                    description = _get_swagger_description(swagger, swagger_path, method, resp.status)
-                    logger.info("'%s' %s %s, status: %s, description: %s\n\tpayload: %s\n\tresponse data: %s" %
-                                (name,
-                                 _full_url,
-                                 method.upper(),
-                                 resp.status,
-                                 description,
-                                 data,
-                                 resp_data))
-                    if description == UNKNOWN:
-                        raise ClientResponseError(resp, ())
+                resp_data = await async_http_request(session, _full_url, **kwargs)
             except (ClientConnectorError, ClientOSError, ClientResponseError) as err:
                 logger.warning(str(err))
+                StatsCounter.append_error_metric(action_name=kwargs['name'])
                 await asyncio.sleep(sleep_time)
                 logger.debug("Increasing sleep time: %s" % sleep_time)
                 sleep_time += 1
                 continue
             else:
                 return resp_data
+
+
+async def async_http_request(session: ClientSession, _full_url: str, **kwargs) -> str:
+    async with session.request(method=kwargs['method'],
+                               url=_full_url,
+                               data=kwargs.get('data'),
+                               headers=kwargs.get('headers'),
+                               params=kwargs.get('params')) as resp:
+        resp_data = await resp.text()
+        description = _get_swagger_description(kwargs['swagger'], kwargs['swagger_path'], kwargs['method'], resp.status)
+        logger.info("'%s' %s %s, status: %s, description: %s\n\tpayload: %s\n\tparams: %s\n\tresponse data: %s" %
+                    (kwargs['name'],
+                     _full_url,
+                     kwargs['method'].upper(),
+                     resp.status,
+                     description,
+                     kwargs.get('data'),
+                     kwargs.get('params'),
+                     resp_data))
+        if description == UNKNOWN:
+            raise ClientResponseError(resp, ())
+        return resp_data
 
 
 def _get_swagger_description(swagger, path, method, status) -> str:
@@ -126,7 +134,7 @@ async def async_sleep(sec):
     await asyncio.sleep(sec)
 
 
-async def get_value(info, key):
+async def get_value(info: Union[str, Dict], key: str):
     try:
         if isinstance(info, dict):
             info = json.dumps(info)

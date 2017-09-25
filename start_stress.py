@@ -6,6 +6,7 @@ from constants import PROJECT, CONFIG
 from configure_logging import configure_logging
 from config import StressTestConfig
 from players.gamek_k02_player import StressTestGameK01Player
+from counter import StatsCounter
 
 # TODO add README.md
 
@@ -17,6 +18,7 @@ def get_cmd_args():
     parser.add_argument('-c', '--config', default=CONFIG, help="JSON file containing settings")
     return parser.parse_args()
 
+
 if __name__ == '__main__':
     logger = configure_logging()
     logger.info("Starting '%s' version %s ..." % (PROJECT, version))
@@ -24,5 +26,10 @@ if __name__ == '__main__':
     config = StressTestConfig(cmd_args.config)
     loop = asyncio.get_event_loop()
     player = StressTestGameK01Player(loop, config, cmd_args.scenario)
-    player.run_player()
-    loop.close()
+    try:
+        player.run_player()
+        loop.close()
+    finally:
+        logger.info("Time metrics: %s" % StatsCounter.get_averages())
+        logger.info("Errors metrics: %s" % dict(StatsCounter.get_errors()))
+        logger.info("Total time: %s" % StatsCounter.get_total_time())

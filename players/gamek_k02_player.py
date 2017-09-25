@@ -5,7 +5,7 @@ from urllib.parse import urljoin
 
 from constants import *
 from interfaces import BaseStressTestPlayer
-from utils import get_swagger, parse_scenario_template
+from utils import get_swagger, parse_scenario_template, timeit_decorator
 
 __all__ = ['StressTestGameK01Player']
 
@@ -19,6 +19,7 @@ class StressTestGameK01Player(BaseStressTestPlayer):
         self._api_users_swagger = None
         self._api_admin_swagger = None
 
+    @timeit_decorator
     def run_player(self):
         for iteration in range(self._config[ITERATIONS_NUMBER]):
             self.loop.run_until_complete(self.get_tasks())
