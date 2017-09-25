@@ -1,5 +1,6 @@
+PROJECT = 'StressTester'
 CONFIG = 'config.json'
-SCENARIO = 'scenario.json'
+
 API = 'api'
 AUTH = 'auth'
 USERS_NUMBER = 'users_number'

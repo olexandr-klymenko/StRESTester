@@ -12,3 +12,4 @@ def configure_logging():
     formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(module)s - %(message)s')
     channel.setFormatter(formatter)
     logger.addHandler(channel)
+    return logger

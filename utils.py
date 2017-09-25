@@ -1,9 +1,11 @@
 from logging import getLogger
 import asyncio
+import time
 import json
 from typing import Dict, List, ByteString
 from urllib.parse import urljoin
 from urllib.request import urlopen
+
 
 from aiohttp import ClientSession
 from aiohttp.client_exceptions import ClientConnectorError, ClientOSError, ClientResponseError
@@ -14,6 +16,31 @@ __all__ = ['get_swagger', 'async_rest_call', 'parse_scenario_template', 'async_s
 
 
 logger = getLogger('asyncio')
+
+
+def timeit(func):
+    async def process(func, *args, **params):
+        if 'name' in params:
+            print(params['name'])
+        if asyncio.iscoroutinefunction(func):
+            print('this function is a coroutine: {}'.format(func.__name__))
+            return await func(*args, **params)
+        else:
+            print('this is not a coroutine')
+            return func(*args, **params)
+
+    async def helper(*args, **params):
+        print('{}.time'.format(func.__name__))
+        start = time.time()
+        result = await process(func, *args, **params)
+
+        # Test normal function route...
+        # result = await process(lambda *a, **p: print(*a, **p), *args, **params)
+
+        print('>>>', time.time() - start)
+        return result
+
+    return helper
 
 
 def get_swagger(url, swagger_json=SWAGGER_JSON) -> Dict:
@@ -27,6 +54,8 @@ def get_swagger(url, swagger_json=SWAGGER_JSON) -> Dict:
 # TODO create decorator for collecting errors
 # TODO add doc strings
 
+
+@timeit
 async def async_rest_call(name, method, url, path, swagger, swagger_path,
                           data=None, params=None, headers=None, raw=False) -> ByteString:
     if raw:

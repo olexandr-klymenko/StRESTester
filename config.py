@@ -12,7 +12,7 @@ logger = getLogger(__name__)
 
 
 class StressTestConfig(BaseStressTestConfig):
-    def __init__(self, config=CONFIG):
+    def __init__(self, config):
         super().__init__(config)
         self._validate_config()
 

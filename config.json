@@ -1,6 +1,6 @@
 {
   "api": "http://127.0.0.1:8000",
   "auth": "http://10.10.7.30:8000",
-  "users_number": 100,
-  "iterations_number": 5
+  "users_number": 1,
+  "iterations_number": 1
 }
