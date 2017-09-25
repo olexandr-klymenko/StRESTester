@@ -21,24 +21,19 @@ class StressTestGameK01Player(BaseStressTestPlayer):
 
     @timeit_decorator
     def run_player(self):
-        for iteration in range(self._config[ITERATIONS_NUMBER]):
-            self.loop.run_until_complete(self.get_tasks())
-
-    def get_tasks(self) -> asyncio.Future:
         self._set_swaggers()
-        _tasks = []
-        for user_count in range(self._config[USERS_NUMBER]):
-            scenario_kwargs = {
-                'auth_url': self._config[AUTH],
-                'api_url': self._config[API],
-                'auth_swagger': self._auth_swagger,
-                'api_users_swagger': self._api_users_swagger,
-                'api_admin_swagger': self._api_admin_swagger,
-                'username': "%s_%s" % (TEST_USER_NAME, user_count),
-                'password': TEST_USER_PASSWORD
-            }
-            _tasks.append(self.do_play(**scenario_kwargs))
-        return asyncio.gather(*_tasks)
+        for iteration in range(self._config[ITERATIONS_NUMBER]):
+            for user_count in range(self._config[USERS_NUMBER]):
+                scenario_kwargs = {
+                    'auth_url': self._config[AUTH],
+                    'api_url': self._config[API],
+                    'auth_swagger': self._auth_swagger,
+                    'api_users_swagger': self._api_users_swagger,
+                    'api_admin_swagger': self._api_admin_swagger,
+                    'username': "%s_%s" % (TEST_USER_NAME, user_count),
+                    'password': TEST_USER_PASSWORD
+                }
+                self.loop.run_until_complete(self.do_play(**scenario_kwargs))
 
 # TODO Generalize adding swaggers
     def _set_swaggers(self):

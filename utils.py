@@ -20,9 +20,9 @@ logger = getLogger('asyncio')
 def async_timeit_decorator(coro) -> asyncio.coroutine:
     async def wrapper(*args, **kwargs):
         start = timeit.default_timer()
-        print("%s -->" % start)
+        # print("%s -->" % start)
         result = await coro(*args, **kwargs)
-        print("--> %s" % timeit.default_timer())
+        # print("--> %s" % timeit.default_timer())
         action_name = kwargs.get('name', coro.__name__)
         time_metric = timeit.default_timer() - start
         StatsCounter.append_time_metric((action_name, time_metric))
@@ -74,6 +74,7 @@ async def async_rest_call(**kwargs) -> Union[str, bytes]:
                 return resp_data
 
 
+@async_timeit_decorator
 async def async_http_request(session: ClientSession, _full_url: str, **kwargs) -> str:
     async with session.request(method=kwargs['method'],
                                url=_full_url,
