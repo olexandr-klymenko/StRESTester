@@ -1,4 +1,5 @@
 import json
+from logging import getLogger
 
 import validators
 
@@ -6,6 +7,8 @@ from constants import *
 from interfaces import BaseStressTestConfig
 
 __all__ = ['StressTestConfig']
+
+logger = getLogger(__name__)
 
 
 class StressTestConfig(BaseStressTestConfig):
