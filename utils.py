@@ -25,6 +25,7 @@ def get_swagger(url, swagger_json=SWAGGER_JSON) -> Dict:
 # TODO create time decorator to measure execution time
 # TODO investigate global sleep time as Singleton
 # TODO create decorator for collecting errors
+# TODO add doc strings
 
 async def async_rest_call(name, method, url, path, swagger, swagger_path,
                           data=None, params=None, headers=None, raw=False) -> ByteString:
