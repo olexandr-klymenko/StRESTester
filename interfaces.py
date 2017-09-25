@@ -5,7 +5,6 @@ __all__ = ['BaseStressTestConfig', 'BaseStressTestPlayer']
 
 
 class BaseStressTestConfig(dict, metaclass=ABCMeta):
-
     def __init__(self, config):
         self._config = self._read_config(config)
         self._validate_config()

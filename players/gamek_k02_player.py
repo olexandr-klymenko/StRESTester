@@ -1,11 +1,11 @@
-from typing import Dict, AnyStr
 import asyncio
-from urllib.parse import urljoin
 import json
+from typing import Dict, AnyStr
+from urllib.parse import urljoin
 
+from constants import *
 from interfaces import BaseStressTestPlayer
 from utils import get_swagger, parse_scenario_template
-from constants import *
 
 __all__ = ['StressTestGameK01Player']
 
@@ -17,6 +17,7 @@ class StressTestGameK01Player(BaseStressTestPlayer):
         self._scenario_path = scenario_path
         self._auth_swagger = None
         self._api_users_swagger = None
+        self._api_admin_swagger = None
 
     def run_player(self):
         for iteration in range(self._config[ITERATIONS_NUMBER]):
@@ -31,15 +32,18 @@ class StressTestGameK01Player(BaseStressTestPlayer):
                 'api_url': self._config[API],
                 'auth_swagger': self._auth_swagger,
                 'api_users_swagger': self._api_users_swagger,
+                'api_admin_swagger': self._api_admin_swagger,
                 'username': "%s_%s" % (TEST_USER_NAME, user_count),
                 'password': TEST_USER_PASSWORD
             }
             _tasks.append(self.do_play(**scenario_kwargs))
         return asyncio.gather(*_tasks)
 
+# TODO Generalize adding swaggers
     def _set_swaggers(self):
         self._auth_swagger = get_swagger(self._config[AUTH])
         self._api_users_swagger = get_swagger(urljoin(self._config[API], '/users/'))
+        self._api_admin_swagger = get_swagger(urljoin(self._config[API], '/admin/'))
 
     async def do_play(self, **kwargs):
         with open(self._scenario_path) as scenario_file:

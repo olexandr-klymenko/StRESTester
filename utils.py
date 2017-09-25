@@ -1,14 +1,14 @@
+import asyncio
 import json
 from typing import Dict, List, ByteString
 from urllib.parse import urljoin
 from urllib.request import urlopen
-import asyncio
 
 import aiohttp
 
 from constants import SWAGGER_JSON, PATHS
 
-__all__ = ['get_swagger', 'async_rest_call', 'parse_scenario_template']
+__all__ = ['get_swagger', 'async_rest_call', 'parse_scenario_template', 'async_sleep']
 
 
 def get_swagger(url, swagger_json=SWAGGER_JSON) -> Dict:
@@ -17,7 +17,9 @@ def get_swagger(url, swagger_json=SWAGGER_JSON) -> Dict:
         return swagger
 
 
-async def async_rest_call(method, url, path, swagger, swagger_path,
+# TODO create time decorator to measure execution time
+
+async def async_rest_call(name, method, url, path, swagger, swagger_path,
                           data=None, params=None, headers=None, raw=False) -> ByteString:
     if raw:
         data = json.dumps(data)
@@ -25,8 +27,9 @@ async def async_rest_call(method, url, path, swagger, swagger_path,
         _full_url = urljoin(url, path)
         async with getattr(session, method)(_full_url, data=data, headers=headers, params=params) as resp:
             resp_data = await resp.text()
-            print("url: %s, method: %s, status: %s, description: %s, payload: %s, response data: %s" %
-                  (_full_url,
+            print("name: %s, url: %s, method: %s, status: %s, description: %s, payload: %s, response data: %s" %
+                  (name,
+                   _full_url,
                    method,
                    resp.status,
                    _get_swagger_description(swagger, swagger_path, method, resp.status),
@@ -39,7 +42,7 @@ def _get_swagger_description(swagger, path, method, status) -> ByteString:
     try:
         return swagger[PATHS][path][method]['responses'][str(status)]['description']
     except KeyError:
-        return b'Unknown'
+        return b'!!!Unknown'
 
 
 async def parse_scenario_template(template: List, *namespaces):
@@ -69,7 +72,7 @@ async def parse_scenario_template(template: List, *namespaces):
             await func(**parsed_kwargs)
 
 
-async def sleep_(sec):
+async def async_sleep(sec):
     await asyncio.sleep(sec)
 
 
@@ -77,4 +80,3 @@ async def get_value(info, key):
     if isinstance(info, dict):
         info = json.dumps(info)
     return json.loads(info)[key]
-

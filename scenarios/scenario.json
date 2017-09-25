@@ -1,24 +1,27 @@
 [
   {"async_rest_call": {
-      "method": "post",
-      "url": "auth_url",
-      "path": "'/users/'",
-      "swagger": "auth_swagger",
-      "swagger_path": "'/users/'",
-      "data": "{'login': username, 'password': password}"
+    "name": "'Create User'",
+    "method": "post",
+    "url": "auth_url",
+    "path": "'/users/'",
+    "swagger": "auth_swagger",
+    "swagger_path": "'/users/'",
+    "data": "{'login': username, 'password': password}"
   }},
 
   {"async_rest_call": [{
-      "method": "post",
-      "url": "auth_url",
-      "path": "'/tokens/'",
-      "swagger": "auth_swagger",
-      "swagger_path": "'/tokens/'",
-      "data": "{'login': username, 'password': password}"
+    "name": "'Get Auth Token'",
+    "method": "post",
+    "url": "auth_url",
+    "path": "'/tokens/'",
+    "swagger": "auth_swagger",
+    "swagger_path": "'/tokens/'",
+    "data": "{'login': username, 'password': password}"
   },
     "auth_token"]},
   {
     "async_rest_call": [{
+      "name": "'Login'",
       "method": "post",
       "url": "api_url",
       "path": "'/users/login/'",
@@ -40,6 +43,7 @@
   },
   {
     "async_rest_call": [{
+      "name": "'Create Profile'",
       "method": "post",
       "url": "api_url",
       "path": "'/users/profile/'",
@@ -77,16 +81,18 @@
     ]
   },
   {"async_rest_call": {
-      "method": "delete",
-      "url": "api_url",
-      "path": "'/admin/profiles/'",
-      "swagger": "api_users_swagger",
-      "swagger_path": "'/users/'",
-      "params": "{'profile_id': profile_id, 'user_id': user_id}"
+    "name": "'Delete profile'",
+    "method": "delete",
+    "url": "api_url",
+    "path": "'/admin/profiles/'",
+    "swagger": "api_admin_swagger",
+    "swagger_path": "'/profiles/'",
+    "params": "{'profile_id': profile_id, 'user_id': user_id}"
     }
   },
 
   {"async_rest_call": {
+    "name": "'Delete User'",
     "method": "delete",
     "url": "auth_url",
     "path": "'/users/%s' % username",
