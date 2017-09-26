@@ -7,7 +7,7 @@ from configure_logging import configure_logging
 from config import StressTestConfig
 from players.gamek_k02_player import StressTestGameK01Player
 from counter import StatsCounter
-from swagger_info import SwaggerInfo
+from swagger_info import Swagger
 
 # TODO add README.md
 
@@ -26,7 +26,7 @@ if __name__ == '__main__':
     cmd_args = get_cmd_args()
     config = StressTestConfig(cmd_args.config)
     loop = asyncio.get_event_loop()
-    SwaggerInfo.parse(loop, config)
+    Swagger.parse(loop, config)
     player = StressTestGameK01Player(loop=loop, config=config, scenario=cmd_args.scenario)
     try:
         player.run_player()

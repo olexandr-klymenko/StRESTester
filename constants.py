@@ -8,7 +8,6 @@ ITERATIONS_NUMBER = 'iterations_number'
 BLUEPRINTS_INFO = 'blueprints_info'
 CONFIG_FIELDS = (API, AUTH, USERS_NUMBER, ITERATIONS_NUMBER, BLUEPRINTS_INFO)
 
-SWAGGER_INFO = 'swagger_info'
 SWAGGER_JSON = 'swagger.json'
 PATHS = 'paths'
 

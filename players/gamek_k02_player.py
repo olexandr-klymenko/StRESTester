@@ -21,12 +21,10 @@ class StressTestGameK01Player(BaseStressTestPlayer):
         for iteration in range(self._config[ITERATIONS_NUMBER]):
             for user_count in range(self._config[USERS_NUMBER]):
                 scenario_kwargs = {
-                    'api': self._config[API],
-                    'auth':  self._config[AUTH],
                     'username': "%s_%s" % (TEST_USER_NAME, user_count),
                     'password': TEST_USER_PASSWORD
                 }
-
+                scenario_kwargs.update(self._config)
                 coro = utils.parse_scenario_template(scenario_xml_root, scenario_kwargs)
                 self.loop.run_until_complete(coro)
 

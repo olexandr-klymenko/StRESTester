@@ -9,10 +9,10 @@ from xml.etree import ElementTree as ET
 from aiohttp import ClientSession
 from aiohttp.client_exceptions import ClientConnectorError, ClientOSError, ClientResponseError
 
-from constants import PATHS, UNKNOWN, RETURN, SWAGGER_INFO
+from constants import PATHS, UNKNOWN, RETURN
 from counter import StatsCounter
 from actions_registry import ActionsRegistry, register_action_decorator
-from swagger_info import SwaggerInfo
+from swagger_info import Swagger
 
 __all__ = ['async_rest_call', 'parse_scenario_template', 'async_sleep', 'parse_scenario_template',
            'timeit_decorator', 'async_get_swagger']
@@ -90,9 +90,12 @@ def _get_swagger_description(status, **kwargs) -> str:
     path = kwargs['swagger_path']
     method = kwargs['method']
 
-    for blueprint, swagger in SwaggerInfo.info[url].items():
+    for blueprint, swagger in Swagger.info[url].items():
         if kwargs['path'].startswith(blueprint):
-            return swagger[PATHS][path][method.lower()]['responses'][str(status)]['description']
+            try:
+                return swagger[PATHS][path][method.lower()]['responses'][str(status)]['description']
+            except KeyError:
+                return UNKNOWN
 
 
 async def parse_scenario_template(template_root: ET.Element, scenario_kwargs):
@@ -117,13 +120,6 @@ async def parse_scenario_template(template_root: ET.Element, scenario_kwargs):
             scenario_kwargs[return_variable] = await coro(*parsed_args, **parsed_kwargs)
         else:
             await coro(*parsed_args, **parsed_kwargs)
-
-
-def get_swagger(parsed_kwargs, scenario_kwargs) -> Dict:
-    print(parsed_kwargs)
-    for blueprint, swagger in scenario_kwargs[SWAGGER_INFO][parsed_kwargs['url']].items():
-        if parsed_kwargs['path'].startswith(blueprint):
-            return swagger
 
 
 @register_action_decorator('sleep')
