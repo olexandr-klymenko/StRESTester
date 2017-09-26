@@ -1,7 +1,7 @@
 from abc import ABCMeta, abstractmethod
 from typing import Dict
 
-__all__ = ['BaseStressTestConfig', 'BaseStressTestPlayer']
+__all__ = ['BaseStressTestConfig', 'BaseStressTestPlayer', 'MetaSingleton']
 
 
 class BaseStressTestConfig(dict, metaclass=ABCMeta):
@@ -30,3 +30,12 @@ class BaseStressTestPlayer(metaclass=ABCMeta):
     @abstractmethod
     def run_player(self):
         pass
+
+
+class MetaSingleton(type):
+    _instances = {}
+
+    def __call__(cls, *args, **kwargs):
+        if cls not in cls._instances:
+            cls._instances[cls] = super().__call__(*args, **kwargs)
+        return cls._instances[cls]

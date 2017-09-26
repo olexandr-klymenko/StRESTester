@@ -1,6 +1,5 @@
 import asyncio
 from typing import Dict, AnyStr
-from urllib.parse import urljoin
 
 from constants import *
 from interfaces import BaseStressTestPlayer
@@ -15,32 +14,22 @@ class StressTestGameK01Player(BaseStressTestPlayer):
         self.loop = loop
         self._config = config
         self._scenario = scenario
-        self._auth_swagger = None
-        self._api_users_swagger = None
-        self._api_admin_swagger = None
 
     @utils.timeit_decorator
     def run_player(self):
         scenario_xml_root = get_parsed_scenario_root(self._scenario)
-        self._set_swaggers()
         for iteration in range(self._config[ITERATIONS_NUMBER]):
             for user_count in range(self._config[USERS_NUMBER]):
                 scenario_kwargs = {
-                    'auth_url': self._config[AUTH],
-                    'api_url': self._config[API],
-                    'auth_swagger': self._auth_swagger,
-                    'api_users_swagger': self._api_users_swagger,
-                    'api_admin_swagger': self._api_admin_swagger,
+                    'api': self._config[API],
+                    'auth':  self._config[AUTH],
                     'username': "%s_%s" % (TEST_USER_NAME, user_count),
                     'password': TEST_USER_PASSWORD
                 }
-                coro = utils.parse_scenario_template(scenario_xml_root, globals(), scenario_kwargs)
+
+                coro = utils.parse_scenario_template(scenario_xml_root, scenario_kwargs)
                 self.loop.run_until_complete(coro)
 
-# TODO Generalize adding swaggers
 # TODO Use 3rd party swagger parser
-
-    def _set_swaggers(self):
-        self._auth_swagger = utils.get_swagger(self._config[AUTH])
-        self._api_users_swagger = utils.get_swagger(urljoin(self._config[API], '/users/'))
-        self._api_admin_swagger = utils.get_swagger(urljoin(self._config[API], '/admin/'))
+# TODO add XML validation according to swagger_info
+# TODO figure out swagger path from swagger_info

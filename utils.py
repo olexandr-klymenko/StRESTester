@@ -4,18 +4,18 @@ import timeit
 from logging import getLogger
 from typing import Dict, Union
 from urllib.parse import urljoin
-from urllib.request import urlopen
 from xml.etree import ElementTree as ET
 
 from aiohttp import ClientSession
 from aiohttp.client_exceptions import ClientConnectorError, ClientOSError, ClientResponseError
 
-from constants import SWAGGER_JSON, PATHS, UNKNOWN, RETURN
+from constants import PATHS, UNKNOWN, RETURN, SWAGGER_INFO
 from counter import StatsCounter
 from actions_registry import ActionsRegistry, register_action_decorator
+from swagger_info import SwaggerInfo
 
-__all__ = ['get_swagger', 'async_rest_call', 'parse_scenario_template', 'async_sleep', 'parse_scenario_template',
-           'timeit_decorator']
+__all__ = ['async_rest_call', 'parse_scenario_template', 'async_sleep', 'parse_scenario_template',
+           'timeit_decorator', 'async_get_swagger']
 
 logger = getLogger('asyncio')
 
@@ -41,12 +41,6 @@ def timeit_decorator(func):
         logger.debug("Function '%s' execution time: %s" % (func_name, time_metric))
         return result
     return wrapper
-
-
-def get_swagger(url, swagger_json=SWAGGER_JSON) -> Dict:
-    with urlopen(urljoin(url, swagger_json)) as response:
-        swagger = json.loads(response.read())
-        return swagger
 
 # TODO add doc strings
 
@@ -76,7 +70,7 @@ async def async_http_request(name, session: ClientSession, _full_url: str, **kwa
                                headers=kwargs.get('headers'),
                                params=kwargs.get('params')) as resp:
         resp_data = await resp.text()
-        description = _get_swagger_description(kwargs['swagger'], kwargs['swagger_path'], kwargs['method'], resp.status)
+        description = _get_swagger_description(resp.status, **kwargs)
         logger.info("'%s' %s %s, status: %s, description: %s\n\tpayload: %s\n\tparams: %s\n\tresponse data: %s" %
                     (name,
                      _full_url,
@@ -91,15 +85,17 @@ async def async_http_request(name, session: ClientSession, _full_url: str, **kwa
         return resp_data
 
 
-def _get_swagger_description(swagger, path, method, status) -> str:
-    try:
-        return swagger[PATHS][path][method.lower()]['responses'][str(status)]['description']
-    except KeyError:
-        return UNKNOWN
+def _get_swagger_description(status, **kwargs) -> str:
+    url = kwargs['url']
+    path = kwargs['swagger_path']
+    method = kwargs['method']
+
+    for blueprint, swagger in SwaggerInfo.info[url].items():
+        if kwargs['path'].startswith(blueprint):
+            return swagger[PATHS][path][method.lower()]['responses'][str(status)]['description']
 
 
-async def parse_scenario_template(template_root: ET.Element, *namespaces):
-    global_ns, local_ns = namespaces
+async def parse_scenario_template(template_root: ET.Element, scenario_kwargs):
 
     for child in template_root:
         parsed_args = []
@@ -113,14 +109,21 @@ async def parse_scenario_template(template_root: ET.Element, *namespaces):
 
         for node in child:
             try:
-                parsed_kwargs[node.tag] = eval(node.text, global_ns, local_ns)
+                parsed_kwargs[node.tag] = eval(node.text, globals(), scenario_kwargs)
             except (NameError, SyntaxError):
                 parsed_kwargs[node.tag] = node.text
 
         if return_variable:
-            local_ns[return_variable] = await coro(*parsed_args, **parsed_kwargs)
+            scenario_kwargs[return_variable] = await coro(*parsed_args, **parsed_kwargs)
         else:
             await coro(*parsed_args, **parsed_kwargs)
+
+
+def get_swagger(parsed_kwargs, scenario_kwargs) -> Dict:
+    print(parsed_kwargs)
+    for blueprint, swagger in scenario_kwargs[SWAGGER_INFO][parsed_kwargs['url']].items():
+        if parsed_kwargs['path'].startswith(blueprint):
+            return swagger
 
 
 @register_action_decorator('sleep')

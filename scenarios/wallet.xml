@@ -1,25 +1,22 @@
 <scenario>
     <rest name="Create User">
         <method>POST</method>
-        <url>auth_url</url>
+        <url>auth</url>
         <path>/users/</path>
-        <swagger>auth_swagger</swagger>
         <swagger_path>/users/</swagger_path>
         <data>{"login": username, "password": password}</data>
     </rest>
     <rest name="Get Auth Token" return="auth_token">
         <method>POST</method>
-        <url>auth_url</url>
+        <url>auth</url>
         <path>/tokens/</path>
-        <swagger>auth_swagger</swagger>
         <swagger_path>/tokens/</swagger_path>
         <data>{"login": username, "password": password}</data>
     </rest>
     <rest name="Login" return="jwt_token">
         <method>POST</method>
-        <url>api_url</url>
+        <url>api</url>
         <path>/users/login/</path>
-        <swagger>api_users_swagger</swagger>
         <swagger_path>/login/</swagger_path>
         <data>auth_token</data>
         <headers>{'content-type': 'application/json'}</headers>
@@ -30,9 +27,8 @@
     </get>
     <rest name="Create Profile" return="user_info">
         <method>POST</method>
-        <url>api_url</url>
+        <url>api</url>
         <path>/users/profile/</path>
-        <swagger>api_users_swagger</swagger>
         <swagger_path>/profile/</swagger_path>
         <data>{"nickname": username}</data>
         <headers>{"content-type": "application/json", "Authorization": "Bearer: %s" % jwt_token}</headers>
@@ -53,9 +49,8 @@
     <repeat cycles="10">
         <rest name="Set user wallet to 10">
             <method>PUT</method>
-            <url>api_url</url>
+            <url>api</url>
             <path>"/admin/wallet/%s" % user_id</path>
-            <swagger>api_admin_swagger</swagger>
             <swagger_path>/wallet/{user_id}</swagger_path>
             <data>{"amount": 10}</data>
             <headers>{"content-type": "application/json"}</headers>
@@ -63,17 +58,15 @@
         </rest>
         <rest name="Get user wallet">
             <method>GET</method>
-            <url>api_url</url>
+            <url>api</url>
             <path>/users/wallet/</path>
-            <swagger>api_admin_swagger</swagger>
-            <swagger_path>/wallet/{user_id}</swagger_path>
+            <swagger_path>/wallet/</swagger_path>
             <headers>{"content-type": "application/json", "Authorization": "Bearer: %s" % jwt_token}</headers>
         </rest>
         <rest name="Patch money amount">
             <method>PATCH</method>
-            <url>api_url</url>
+            <url>api</url>
             <path>"/admin/wallet/%s" % user_id</path>
-            <swagger>api_admin_swagger</swagger>
             <swagger_path>/wallet/{user_id}</swagger_path>
             <data>{"amount": 10}</data>
             <headers>{"content-type": "application/json"}</headers>
@@ -82,17 +75,15 @@
     </repeat>
     <rest name="Delete profile">
         <method>DELETE</method>
-        <url>api_url</url>
+        <url>api</url>
         <path>/admin/profiles/</path>
-        <swagger>api_admin_swagger</swagger>
         <swagger_path>/profiles/</swagger_path>
         <params>{"profile_id": profile_id, "user_id": user_id}</params>
     </rest>
     <rest name="Delete User">
         <method>DELETE</method>
-        <url>auth_url</url>
+        <url>auth</url>
         <path>"/users/%s" % username</path>
-        <swagger>auth_swagger</swagger>
         <swagger_path>/users/{login}</swagger_path>
     </rest>
 </scenario>
