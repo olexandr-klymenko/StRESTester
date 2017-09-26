@@ -14,3 +14,5 @@ TEST_USER_NAME = 'st_user'
 TEST_USER_PASSWORD = '123'
 
 UNKNOWN = '!!! UNKNOWN !!!'
+
+RETURN = 'return'

@@ -1,0 +1,68 @@
+<scenario>
+    <rest name="Create User">
+        <method>POST</method>
+        <url>auth_url</url>
+        <path>/users/</path>
+        <swagger>auth_swagger</swagger>
+        <swagger_path>/users/</swagger_path>
+        <data>{"login": username, "password": password}</data>
+    </rest>
+    <rest name="Get Auth Token" return="auth_token">
+        <method>POST</method>
+        <url>auth_url</url>
+        <path>/tokens/</path>
+        <swagger>auth_swagger</swagger>
+        <swagger_path>/tokens/</swagger_path>
+        <data>{"login": username, "password": password}</data>
+    </rest>
+    <rest name="Login" return="jwt_token">
+        <method>POST</method>
+        <url>api_url</url>
+        <path>/users/login/</path>
+        <swagger>api_users_swagger</swagger>
+        <swagger_path>/login/</swagger_path>
+        <data>auth_token</data>
+        <headers>{'content-type': 'application/json'}</headers>
+    </rest>
+    <get return="jwt_token">
+        <info>jwt_token</info>
+        <key>token</key>
+    </get>
+        <rest name="Create Profile" return="user_info">
+        <method>POST</method>
+        <url>api_url</url>
+        <path>/users/profile/</path>
+        <swagger>api_users_swagger</swagger>
+        <swagger_path>/profile/</swagger_path>
+        <data>{"nickname": username}</data>
+        <headers>{'content-type': 'application/json', 'Authorization': 'Bearer: %s' % jwt_token}</headers>
+        <raw>True</raw>
+    </rest>
+    <get return="profile_info">
+        <info>user_info</info>
+        <key>profile</key>
+    </get>
+    <get return="profile_id">
+        <info>profile_info</info>
+        <key>profile_id</key>
+    </get>
+    <get return="user_id">
+        <info>profile_info</info>
+        <key>user_id</key>
+    </get>
+    <rest name="Delete profile">
+        <method>DELETE</method>
+        <url>api_url</url>
+        <path>/admin/profiles/</path>
+        <swagger>api_admin_swagger</swagger>
+        <swagger_path>/profiles/</swagger_path>
+        <params>{"profile_id": profile_id, "user_id": user_id}</params>
+    </rest>
+    <rest name="Delete User">
+        <method>DELETE</method>
+        <url>auth_url</url>
+        <path>"/users/%s" % username</path>
+        <swagger>auth_swagger</swagger>
+        <swagger_path>/users/{login}</swagger_path>
+    </rest>
+</scenario>

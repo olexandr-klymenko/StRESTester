@@ -1,25 +1,25 @@
 import asyncio
-import json
 from typing import Dict, AnyStr
 from urllib.parse import urljoin
+from xml.etree import ElementTree as ET
 
 from constants import *
 from interfaces import BaseStressTestPlayer
-from utils import get_swagger, parse_scenario_template, timeit_decorator
+import utils
 
 __all__ = ['StressTestGameK01Player']
 
 
 class StressTestGameK01Player(BaseStressTestPlayer):
-    def __init__(self, loop: asyncio.AbstractEventLoop, config: Dict, scenario_path: AnyStr):
+    def __init__(self, loop: asyncio.AbstractEventLoop, config: Dict, scenario: AnyStr):
         self.loop = loop
         self._config = config
-        self._scenario_path = scenario_path
+        self._scenario = scenario
         self._auth_swagger = None
         self._api_users_swagger = None
         self._api_admin_swagger = None
 
-    @timeit_decorator
+    @utils.timeit_decorator
     def run_player(self):
         self._set_swaggers()
         for iteration in range(self._config[ITERATIONS_NUMBER]):
@@ -36,11 +36,14 @@ class StressTestGameK01Player(BaseStressTestPlayer):
                 self.loop.run_until_complete(self.do_play(**scenario_kwargs))
 
 # TODO Generalize adding swaggers
+# TODO Use 3rd party swagger parser
+
     def _set_swaggers(self):
-        self._auth_swagger = get_swagger(self._config[AUTH])
-        self._api_users_swagger = get_swagger(urljoin(self._config[API], '/users/'))
-        self._api_admin_swagger = get_swagger(urljoin(self._config[API], '/admin/'))
+        self._auth_swagger = utils.get_swagger(self._config[AUTH])
+        self._api_users_swagger = utils.get_swagger(urljoin(self._config[API], '/users/'))
+        self._api_admin_swagger = utils.get_swagger(urljoin(self._config[API], '/admin/'))
 
     async def do_play(self, **kwargs):
-        with open(self._scenario_path) as scenario_file:
-            await parse_scenario_template(json.load(scenario_file), globals(), kwargs)
+        with open(self._scenario) as scenario_file:
+            xml_root = ET.parse(scenario_file).getroot()
+            await utils.parse_scenario_template(xml_root, globals(), kwargs)
