@@ -1,11 +1,11 @@
 import asyncio
 from typing import Dict, AnyStr
 from urllib.parse import urljoin
-from xml.etree import ElementTree as ET
 
 from constants import *
 from interfaces import BaseStressTestPlayer
 import utils
+from scenario_parser import get_parsed_scenario_root
 
 __all__ = ['StressTestGameK01Player']
 
@@ -21,6 +21,7 @@ class StressTestGameK01Player(BaseStressTestPlayer):
 
     @utils.timeit_decorator
     def run_player(self):
+        scenario_xml_root = get_parsed_scenario_root(self._scenario)
         self._set_swaggers()
         for iteration in range(self._config[ITERATIONS_NUMBER]):
             for user_count in range(self._config[USERS_NUMBER]):
@@ -33,7 +34,8 @@ class StressTestGameK01Player(BaseStressTestPlayer):
                     'username': "%s_%s" % (TEST_USER_NAME, user_count),
                     'password': TEST_USER_PASSWORD
                 }
-                self.loop.run_until_complete(self.do_play(**scenario_kwargs))
+                coro = utils.parse_scenario_template(scenario_xml_root, globals(), scenario_kwargs)
+                self.loop.run_until_complete(coro)
 
 # TODO Generalize adding swaggers
 # TODO Use 3rd party swagger parser
@@ -42,8 +44,3 @@ class StressTestGameK01Player(BaseStressTestPlayer):
         self._auth_swagger = utils.get_swagger(self._config[AUTH])
         self._api_users_swagger = utils.get_swagger(urljoin(self._config[API], '/users/'))
         self._api_admin_swagger = utils.get_swagger(urljoin(self._config[API], '/admin/'))
-
-    async def do_play(self, **kwargs):
-        with open(self._scenario) as scenario_file:
-            xml_root = ET.parse(scenario_file).getroot()
-            await utils.parse_scenario_template(xml_root, globals(), kwargs)

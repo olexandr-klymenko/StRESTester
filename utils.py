@@ -23,13 +23,10 @@ logger = getLogger('asyncio')
 def async_timeit_decorator(coro) -> asyncio.coroutine:
     async def wrapper(*args, **kwargs):
         start = timeit.default_timer()
-        # print("%s -->" % start)
         result = await coro(*args, **kwargs)
-        # print("--> %s" % timeit.default_timer())
         action_name = args[0]
         time_metric = timeit.default_timer() - start
         StatsCounter.append_time_metric((action_name, time_metric))
-        logger.debug("Action '%s' execution time: %s" % (action_name, time_metric))
         return result
 
     return wrapper

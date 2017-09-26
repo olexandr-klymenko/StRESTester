@@ -16,3 +16,6 @@ TEST_USER_PASSWORD = '123'
 UNKNOWN = '!!! UNKNOWN !!!'
 
 RETURN = 'return'
+
+REPEAT = 'repeat'
+CYCLES = 'cycles'
