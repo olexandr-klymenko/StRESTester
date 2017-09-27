@@ -1,13 +1,14 @@
 import asyncio
 from argparse import ArgumentParser
 
-from version import version
-from constants import PROJECT, CONFIG
-from configure_logging import configure_logging
 from config import StressTestConfig
-from players.gamek_k02_player import StressTestGameK01Player
+from configure_logging import configure_logging
+from constants import PROJECT, CONFIG
 from counter import StatsCounter
+from player import StressTestPlayer
 from swagger_info import Swagger
+from version import version
+
 
 # TODO add README.md
 
@@ -27,7 +28,7 @@ if __name__ == '__main__':
     config = StressTestConfig(cmd_args.config)
     loop = asyncio.get_event_loop()
     Swagger.parse(loop, config)
-    player = StressTestGameK01Player(loop=loop, config=config, scenario=cmd_args.scenario)
+    player = StressTestPlayer(loop=loop, config=config, scenario=cmd_args.scenario)
     try:
         player.run_player()
         loop.close()

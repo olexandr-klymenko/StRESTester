@@ -1,15 +1,15 @@
 import asyncio
 from typing import Dict, AnyStr
 
+import utils
 from constants import *
 from interfaces import BaseStressTestPlayer
-import utils
 from scenario_parser import get_parsed_scenario_root
 
-__all__ = ['StressTestGameK01Player']
+__all__ = ['StressTestPlayer']
 
 
-class StressTestGameK01Player(BaseStressTestPlayer):
+class StressTestPlayer(BaseStressTestPlayer):
     def __init__(self, loop: asyncio.AbstractEventLoop, config: Dict, scenario: AnyStr):
         self.loop = loop
         self._config = config

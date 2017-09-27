@@ -1,18 +1,16 @@
-from logging import getLogger
-from urllib.parse import urljoin
-import json
-from typing import Dict
 import asyncio
+import json
 from collections import defaultdict
+from logging import getLogger
+from typing import Dict
+from urllib.parse import urljoin
 
 from aiohttp.client import ClientSession
 from aiohttp.hdrs import METH_GET
 
 from constants import BLUEPRINTS_INFO, SWAGGER_JSON
 
-
 __all__ = ['Swagger']
-
 
 logger = getLogger('asyncio')
 
@@ -31,6 +29,7 @@ class Swagger:
         for swagger_root, swagger_paths in config[BLUEPRINTS_INFO].items():
             for _path in swagger_paths:
                 url = urljoin(urljoin(config[swagger_root], _path), SWAGGER_JSON)
+                logger.info("Adding swagger from '%s'" % url)
                 cls.info[config[swagger_root]][_path] = await _async_get_swagger(url)
 
 
