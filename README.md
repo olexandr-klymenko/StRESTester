@@ -30,5 +30,5 @@ Will be published soon
 
 ## License
 
-Copyright (c) 2015, Yelp, Inc. All rights reserved.
+Copyright (c) 2017, All rights reserved.
 Apache v2
