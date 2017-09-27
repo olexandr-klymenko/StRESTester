@@ -9,13 +9,13 @@ from xml.etree import ElementTree as ET
 from aiohttp import ClientSession
 from aiohttp.client_exceptions import ClientConnectorError, ClientOSError, ClientResponseError
 
-from constants import PATHS, UNKNOWN, RETURN
+from constants import RETURN
 from counter import StatsCounter
 from actions_registry import ActionsRegistry, register_action_decorator
 from swagger_info import Swagger
 
 __all__ = ['async_rest_call', 'parse_scenario_template', 'async_sleep', 'parse_scenario_template',
-           'timeit_decorator', 'async_get_swagger']
+           'timeit_decorator']
 
 logger = getLogger('asyncio')
 
@@ -70,7 +70,7 @@ async def async_http_request(name, session: ClientSession, _full_url: str, **kwa
                                headers=kwargs.get('headers'),
                                params=kwargs.get('params')) as resp:
         resp_data = await resp.text()
-        description = _get_swagger_description(resp.status, **kwargs)
+        description = Swagger.get_description(resp.status, **kwargs)
         logger.info("'%s' %s %s, status: %s, description: %s\n\tpayload: %s\n\tparams: %s\n\tresponse data: %s" %
                     (name,
                      _full_url,
@@ -80,22 +80,7 @@ async def async_http_request(name, session: ClientSession, _full_url: str, **kwa
                      kwargs.get('data'),
                      kwargs.get('params'),
                      resp_data))
-        if description == UNKNOWN:
-            raise ClientResponseError(resp, ())
         return resp_data
-
-
-def _get_swagger_description(status, **kwargs) -> str:
-    url = kwargs['url']
-    path = kwargs['swagger_path']
-    method = kwargs['method']
-
-    for blueprint, swagger in Swagger.info[url].items():
-        if kwargs['path'].startswith(blueprint):
-            try:
-                return swagger[PATHS][path][method.lower()]['responses'][str(status)]['description']
-            except KeyError:
-                return UNKNOWN
 
 
 async def parse_scenario_template(template_root: ET.Element, scenario_kwargs):

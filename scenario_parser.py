@@ -3,6 +3,8 @@ from copy import deepcopy
 
 from constants import REPEAT, CYCLES
 
+# TODO Create separate class for dealing with scenario with validation and so on...
+
 
 def get_parsed_scenario_root(scenario_path) -> ET.Element:
     with open(scenario_path) as f:

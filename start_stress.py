@@ -3,21 +3,21 @@ from argparse import ArgumentParser
 
 from config import StressTestConfig
 from configure_logging import configure_logging
-from constants import PROJECT, CONFIG
+from constants import PROJECT
 from counter import StatsCounter
 from player import StressTestPlayer
 from swagger_info import Swagger
 from version import version
 
 
-# TODO add README.md
-
+# TODO implement swaggerless flow
+# TODO implement multiprocessing flow
 
 def get_cmd_args():
     parser = ArgumentParser()
     parser.add_argument('-s', '--scenario', required=True,
                         help="Path to XML file with stress test scenario, i.e.: 'scenarios/test.xml'")
-    parser.add_argument('-c', '--config', default=CONFIG, help="JSON file containing settings")
+    parser.add_argument('-c', '--config', required=True, help="JSON file containing settings")
     return parser.parse_args()
 
 

@@ -28,6 +28,4 @@ class StressTestPlayer(BaseStressTestPlayer):
                 coro = utils.parse_scenario_template(scenario_xml_root, scenario_kwargs)
                 self.loop.run_until_complete(coro)
 
-# TODO Use 3rd party swagger parser
 # TODO add XML validation according to swagger_info
-# TODO figure out swagger path from swagger_info

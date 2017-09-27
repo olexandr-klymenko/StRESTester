@@ -4,6 +4,8 @@ from collections import defaultdict
 __all__ = ['StatsCounter']
 
 
+# TODO implement report generation
+
 class StatsCounter:
     _time_counter = {}
     _error_counter = defaultdict(int)
