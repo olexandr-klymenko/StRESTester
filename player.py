@@ -11,7 +11,7 @@ __all__ = ['StressTestPlayer']
 
 class StressTestPlayer(BaseStressTestPlayer):
     def __init__(self, loop: asyncio.AbstractEventLoop, config: Dict, scenario: AnyStr):
-        self.loop = loop
+        self._loop = loop
         self._config = config
         self._scenario = scenario
 
@@ -26,6 +26,7 @@ class StressTestPlayer(BaseStressTestPlayer):
                 }
                 scenario_kwargs.update(self._config)
                 coro = utils.parse_scenario_template(scenario_xml_root, scenario_kwargs)
-                self.loop.run_until_complete(coro)
+                self._loop.run_until_complete(coro)
 
 # TODO add XML validation according to swagger_info
+# TODO add XML validation according to action list

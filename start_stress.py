@@ -12,6 +12,9 @@ from version import version
 
 # TODO implement swaggerless flow
 # TODO implement multiprocessing flow
+# TODO implement cmd arg --get_actions
+# TODO add doc strings
+
 
 def get_cmd_args():
     parser = ArgumentParser()

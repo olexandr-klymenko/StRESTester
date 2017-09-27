@@ -14,3 +14,6 @@ TEST_USER_PASSWORD = '123'
 RETURN = 'return'
 REPEAT = 'repeat'
 CYCLES = 'cycles'
+
+MAX_RETRY = 10
+RETRY_DELAY = 1  # seconds

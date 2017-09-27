@@ -8,8 +8,9 @@ from xml.etree import ElementTree as ET
 
 from aiohttp import ClientSession
 from aiohttp.client_exceptions import ClientConnectorError, ClientOSError, ClientResponseError
+from concurrent.futures._base import TimeoutError
 
-from constants import RETURN
+from constants import RETURN, MAX_RETRY, RETRY_DELAY
 from counter import StatsCounter
 from actions_registry import ActionsRegistry, register_action_decorator
 from swagger_info import Swagger
@@ -42,24 +43,26 @@ def timeit_decorator(func):
         return result
     return wrapper
 
-# TODO add doc strings
-
 
 @register_action_decorator('rest')
 async def async_rest_call(name, **kwargs) -> Union[str, bytes]:
     if kwargs.get('raw'):
         kwargs['data'] = json.dumps(kwargs['data'])
-    while True:
+    attempts_left = MAX_RETRY
+    while attempts_left:
         async with ClientSession() as session:
             _full_url = urljoin(kwargs['url'], kwargs['path'])
             try:
                 resp_data = await async_http_request(name, session, _full_url, **kwargs)
-            except (ClientConnectorError, ClientOSError, ClientResponseError) as err:
+            except (ClientConnectorError, ClientOSError, ClientResponseError, TimeoutError) as err:
                 logger.warning(str(err))
                 StatsCounter.append_error_metric(action_name=name)
+                attempts_left -= 1
+                await asyncio.sleep(RETRY_DELAY)
                 continue
             else:
                 return resp_data
+    raise Exception("Max number of retries exceeded")
 
 
 @async_timeit_decorator
@@ -114,10 +117,11 @@ async def async_sleep(sec):
 
 @register_action_decorator('get')
 async def get_value(info: Union[str, Dict], key: str):
+    assert info != "", 'Incorrect dictionary'
     try:
         if isinstance(info, dict):
             info = json.dumps(info)
         return json.loads(info)[key]
     except TypeError:
-        logger.exception("Unexpected value. Expected dict, info: %s\t key: %s" % (info, key))
+        logger.error("Unexpected value of 'info'. Expected: dict(), got: %s" % info)
         raise
