@@ -9,7 +9,7 @@ StressTester is a Python tool for testing RESTful APIs compilant with [Swagger 1
 * create your config.json
 * create your scenario.xml
 * python3 -m pip install requirements.txt
-* python3 start_stress.py -c config.json -s scenario.xml
+* invoke run -c config.json -s scenario.xml
 
 ## Documentation
 

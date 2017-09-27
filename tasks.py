@@ -1,37 +1,29 @@
+from invoke import task
 import asyncio
-from argparse import ArgumentParser
 
 from config import StressTestConfig
 from configure_logging import configure_logging
 from constants import PROJECT
 from counter import StatsCounter
 from player import StressTestPlayer
-from swagger_info import Swagger
+from codes_description import HTTPCodesDescription
+from actions_registry import ActionsRegistry
 from version import version
+import actions
 
-
-# TODO implement swaggerless flow
+# TODO implement jinja2 instead of DIY template
 # TODO implement multiprocessing flow
-# TODO implement cmd arg --get_actions
 # TODO add doc strings
 
 
-def get_cmd_args():
-    parser = ArgumentParser()
-    parser.add_argument('-s', '--scenario', required=True,
-                        help="Path to XML file with stress test scenario, i.e.: 'scenarios/test.xml'")
-    parser.add_argument('-c', '--config', required=True, help="JSON file containing settings")
-    return parser.parse_args()
-
-
-if __name__ == '__main__':
+@task
+def run(_, scenario, config, swagger=False):
     logger = configure_logging()
     logger.info("Starting '%s' version %s ..." % (PROJECT, version))
-    cmd_args = get_cmd_args()
-    config = StressTestConfig(cmd_args.config)
+    _config = StressTestConfig(config)
     loop = asyncio.get_event_loop()
-    Swagger.parse(loop, config)
-    player = StressTestPlayer(loop=loop, config=config, scenario=cmd_args.scenario)
+    HTTPCodesDescription.init(loop, config, swagger)
+    player = StressTestPlayer(loop=loop, config=_config, scenario=scenario)
     try:
         player.run_player()
         loop.close()
@@ -39,3 +31,8 @@ if __name__ == '__main__':
         logger.info("Time metrics: %s" % StatsCounter.get_averages())
         logger.info("Errors metrics: %s" % dict(StatsCounter.get_errors()))
         logger.info("Total time: %s" % StatsCounter.get_total_time())
+
+
+@task
+def actions(_, ):
+    print(ActionsRegistry.get_actions())
