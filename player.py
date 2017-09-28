@@ -15,9 +15,26 @@ __all__ = ['StressTestPlayer']
 class StressTestPlayer:
     def __init__(self, config: Dict, scenario_path: AnyStr, test_users: List):
         self._config = config
-        self._scenario = scenario_path
+        self._scenario_path = scenario_path
         self._scenario_xml_root = self._get_parsed_scenario_root()
         self._test_users = test_users
+
+    def _get_parsed_scenario_root(self) -> ET.Element:
+        with open(self._scenario_path) as f:
+            _root = ET.parse(f).getroot()
+
+        def _parse_root(root: ET.Element, new_root=None) -> ET.Element:
+            for child in root:
+                if child.tag != REPEAT:
+                    if new_root is None:
+                        new_root = ET.Element('scenario')
+                    new_root.append(child)
+                else:
+                    for cycle in range(int(child.attrib[CYCLES])):
+                        _parse_root(deepcopy(child), new_root)
+            return new_root
+
+        return _parse_root(deepcopy(_root))
 
     @timeit_decorator
     def run_player(self):
@@ -32,24 +49,7 @@ class StressTestPlayer:
                 scenario_kwargs.update(self._config)
                 loop.run_until_complete(self._parse_scenario_template(scenario_kwargs))
 
-    def _get_parsed_scenario_root(self) -> ET.Element:
-        with open(self._scenario) as f:
-            _root = ET.parse(f).getroot()
-
-        def _parse_root(root, new_root=None) -> ET.Element:
-            for child in root:
-                if child.tag != REPEAT:
-                    if new_root is None:
-                        new_root = ET.Element('scenario')
-                    new_root.append(child)
-                else:
-                    for cycle in range(int(child.attrib[CYCLES])):
-                        _parse_root(deepcopy(child), new_root)
-            return new_root
-
-        return _parse_root(deepcopy(_root))
-
-    async def _parse_scenario_template(self, scenario_kwargs):
+    async def _parse_scenario_template(self, scenario_kwargs: Dict):
         template_length = len(self._scenario_xml_root)
         for idx, child in enumerate(self._scenario_xml_root):
             parsed_args = []

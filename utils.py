@@ -13,7 +13,7 @@ __all__ = ['parse_scenario_template', 'async_timeit_decorator', 'timeit_decorato
 logger = getLogger('asyncio')
 
 
-def async_timeit_decorator(coro) -> asyncio.coroutine:
+def async_timeit_decorator(coro: asyncio.coroutine) -> asyncio.coroutine:
     async def wrapper(*args, **kwargs):
         start = timeit.default_timer()
         result = await coro(*args, **kwargs)
