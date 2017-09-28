@@ -39,7 +39,7 @@
         <info>{{ profile_info }}</info>
         <key>user_id</key>
     </get>
-    <repeat cycles="10">
+    <repeat cycles="5">
         <rest name="Set user wallet to 10">
             <method>PUT</method>
             <url>{{ api }}/admin/wallet/{{ user_id }}</url>

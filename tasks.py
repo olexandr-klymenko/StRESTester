@@ -1,34 +1,45 @@
+import multiprocessing as mp
+import os
+
 from invoke import task
 
-from config import StressTestConfig
-from configure_logging import configure_logging
-from constants import PROJECT, TEST_USER_NAME, USERS_NUMBER, USER_NUMBER_MULTIPLIER
-from counter import StatsCounter
-from player import StressTestPlayer
-from codes_description import HTTPCodesDescription
 from actions_registry import ActionsRegistry
+from configure_logging import configure_logging
+from constants import *
+from report import StressTestReport
+from stress_test_config import StressTestConfig
 from version import version
-from utils import get_users
-import actions # don't remove
+from worker import main
 
-# TODO implement multiprocessing flow
+
 # TODO add doc strings
 
 
 @task
-def run(_, scenario, config, multiplier=USER_NUMBER_MULTIPLIER, swagger=False):
+def run(_, scenario, config):
     logger = configure_logging()
     logger.info("Starting '%s' version %s ..." % (PROJECT, version))
     _config = StressTestConfig(config)
-    HTTPCodesDescription.init(config, swagger)
-    test_users = get_users(TEST_USER_NAME, _config[USERS_NUMBER], multiplier)
-    player = StressTestPlayer(config=_config, scenario_path=scenario, test_users=test_users)
-    try:
-        player.run_player()
-    finally:
-        logger.info("Time metrics: %s" % StatsCounter.get_averages())
-        logger.info("Errors metrics: %s" % dict(StatsCounter.get_errors()))
-        logger.info("Total time: %s" % StatsCounter.get_total_time())
+    os.environ[ST_SCENARIO_PATH] = scenario
+    os.environ[ST_CONFIG_PATH] = config
+
+    mp.set_start_method('spawn')
+    workers_info = {}
+    report_metrics = []
+    for index in range(1, _config[WORKERS_NUMBER] + 1):
+        parent_conn, child_conn = mp.Pipe()
+        workers_info[index] = parent_conn, mp.Process(target=main, args=(index, child_conn))
+
+    for _, (parent_conn, process) in workers_info.items():
+        process.start()
+
+    for _, (parent_conn, process) in workers_info.items():
+        report_metrics.append(parent_conn.recv())
+
+    for _, (parent_conn, process) in workers_info.items():
+        process.join()
+
+    report = StressTestReport(report_metrics)  # TODO finish report class
 
 
 @task

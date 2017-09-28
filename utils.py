@@ -2,13 +2,12 @@ import asyncio
 import json
 import timeit
 from logging import getLogger
-from typing import Dict, List
+from typing import Dict
 
 from constants import REQUEST_ARGS, SERIALIZABLE_ARGS
 from counter import StatsCounter
 
-__all__ = ['parse_scenario_template', 'async_timeit_decorator', 'timeit_decorator',
-           'get_prepare_request_kwargs', 'get_users']
+__all__ = ['parse_scenario_template', 'async_timeit_decorator', 'timeit_decorator', 'get_prepare_request_kwargs']
 
 logger = getLogger('asyncio')
 
@@ -42,7 +41,3 @@ def get_prepare_request_kwargs(kwarg_info: Dict) -> Dict:
     serializable = {key: json.loads(value) for key, value in _kwargs.items() if key in SERIALIZABLE_ARGS}
     _kwargs.update(serializable)
     return _kwargs
-
-
-def get_users(username, users_number, multiplier) -> List:
-    return ["%s_%s" % (username, idx) for idx in range((multiplier - 1) * users_number, users_number * multiplier)]

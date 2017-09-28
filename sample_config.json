@@ -5,6 +5,7 @@
   },
   "users_number": 1,
   "iterations_number": 1,
+  "workers_number": 5,
   "blueprints_info": {
     "api": ["/users/", "/dedicated/", "/debug/", "/admin/"],
     "auth": ["/"]
