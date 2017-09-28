@@ -21,9 +21,10 @@ def run(_, scenario, config, multiplier=USER_NUMBER_MULTIPLIER, swagger=False):
     logger.info("Starting '%s' version %s ..." % (PROJECT, version))
     _config = StressTestConfig(config)
     HTTPCodesDescription.init(config, swagger)
-    player = StressTestPlayer(config=_config, scenario=scenario)
+    test_users = get_users(TEST_USER_NAME, _config[USERS_NUMBER], multiplier)
+    player = StressTestPlayer(config=_config, scenario_path=scenario, test_users=test_users)
     try:
-        player.run_player(get_users(TEST_USER_NAME, _config[USERS_NUMBER], multiplier))
+        player.run_player()
     finally:
         logger.info("Time metrics: %s" % StatsCounter.get_averages())
         logger.info("Errors metrics: %s" % dict(StatsCounter.get_errors()))
