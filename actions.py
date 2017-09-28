@@ -10,7 +10,7 @@ from aiohttp.client_exceptions import ClientConnectorError, ClientOSError, Clien
 
 from actions_registry import register_action_decorator
 from codes_description import HTTPCodesDescription
-from constants import MAX_RETRY, RETRY_DELAY
+from constants import MAX_RETRY, RETRY_DELAY, REST_REQUEST_TIMEOUT
 from counter import StatsCounter
 from utils import async_timeit_decorator, get_prepare_request_kwargs
 
@@ -42,7 +42,7 @@ async def async_rest_call(name, **kwargs) -> Union[str, bytes]:
 @async_timeit_decorator
 async def async_http_request(name, session: ClientSession, **kwargs) -> str:
     _kwargs = get_prepare_request_kwargs(kwargs)
-    async with session.request(**_kwargs) as resp:
+    async with session.request(timeout=REST_REQUEST_TIMEOUT, **_kwargs) as resp:
         resp_data = await resp.text()
         description = HTTPCodesDescription.get_description(resp.status, **kwargs)
         logger.info("'%s' %s '%s' %s %s, status: %s, description: %s"
