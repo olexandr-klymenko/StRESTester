@@ -1,19 +1,18 @@
 import asyncio
 import json
+import sys
+from concurrent.futures._base import TimeoutError
 from logging import getLogger
 from typing import Dict, Union
-import sys
 
 from aiohttp import ClientSession
 from aiohttp.client_exceptions import ClientConnectorError, ClientOSError, ClientResponseError
-from concurrent.futures._base import TimeoutError
 
-from constants import MAX_RETRY, RETRY_DELAY
-from counter import StatsCounter
 from actions_registry import register_action_decorator
 from codes_description import HTTPCodesDescription
+from constants import MAX_RETRY, RETRY_DELAY
+from counter import StatsCounter
 from utils import async_timeit_decorator, get_prepare_request_kwargs
-
 
 logger = getLogger('asyncio')
 
@@ -44,8 +43,10 @@ async def async_http_request(name, session: ClientSession, **kwargs) -> str:
     async with session.request(**_kwargs) as resp:
         resp_data = await resp.text()
         description = HTTPCodesDescription.get_description(resp.status, **kwargs)
-        logger.info("'%s'\t'%s' %s %s, status: %s, description: %s\n\tpayload: %s\n\tparams: %s\n\tresponse data: %s" %
+        logger.info("'%s' %s '%s' %s %s, status: %s, description: %s"
+                    "\n\tpayload: %s\n\tparams: %s\n\tresponse data: %s" %
                     (kwargs['username'],
+                     kwargs['progress'],
                      name,
                      kwargs['url'],
                      kwargs['method'].upper(),

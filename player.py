@@ -25,9 +25,7 @@ class StressTestPlayer:
                 }
                 scenario_kwargs.update(self._config[URLS])
                 scenario_kwargs.update(self._config)
-                # coro = utils.parse_scenario_template(scenario_xml_root, scenario_kwargs)
                 loop.run_until_complete(utils.parse_scenario_template(scenario_xml_root, scenario_kwargs))
-
 
 # TODO add XML validation according to swagger_info
 # TODO add XML validation according to action list

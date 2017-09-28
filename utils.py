@@ -1,14 +1,15 @@
 import asyncio
+import json
 import timeit
 from logging import getLogger
-from xml.etree import ElementTree as ET
-import json
 from typing import Dict
+from xml.etree import ElementTree as ET
 
+from jinja2 import Template
+
+from actions_registry import ActionsRegistry
 from constants import RETURN, REQUEST_ARGS, SERIALIZABLE_ARGS
 from counter import StatsCounter
-from actions_registry import ActionsRegistry
-from jinja2 import Template
 
 __all__ = ['parse_scenario_template', 'parse_scenario_template', 'async_timeit_decorator', 'timeit_decorator',
            'get_prepare_request_kwargs', 'get_users']
@@ -36,12 +37,13 @@ def timeit_decorator(func):
         time_metric = timeit.default_timer() - start
         logger.debug("Function '%s' execution time: %s" % (func_name, time_metric))
         return result
+
     return wrapper
 
 
 async def parse_scenario_template(template_root: ET.Element, scenario_kwargs):
-
-    for child in template_root:
+    template_length = len(template_root)
+    for idx, child in enumerate(template_root):
         parsed_args = []
         parsed_kwargs = {'xml': ET.tostring(child)}
         action_name = child.tag
@@ -58,6 +60,7 @@ async def parse_scenario_template(template_root: ET.Element, scenario_kwargs):
                 parsed_kwargs[node.tag] = node.text
 
         parsed_kwargs['username'] = scenario_kwargs['username']
+        parsed_kwargs['progress'] = "{:10.1f}%".format(idx * 100 / template_length)
 
         if return_variable:
             scenario_kwargs[return_variable] = await coro(*parsed_args, **parsed_kwargs)
@@ -72,5 +75,5 @@ def get_prepare_request_kwargs(kwarg_info: Dict):
     return _kwargs
 
 
-def get_users(username, users_number, user_number_multiplier):
-    return ["%s_%s" % (username, idx + (user_number_multiplier - 1) * users_number) for idx in range(users_number)]
+def get_users(username, users_number, multiplier):
+    return ["%s_%s" % (username, idx) for idx in range((multiplier - 1) * users_number, users_number * multiplier)]
