@@ -1,7 +1,7 @@
 from abc import ABCMeta, abstractmethod
 from typing import Dict
 
-__all__ = ['BaseStressTestConfig', 'BaseStressTestPlayer']
+__all__ = ['BaseStressTestConfig']
 
 
 class BaseStressTestConfig(dict, metaclass=ABCMeta):
@@ -23,10 +23,4 @@ class BaseStressTestConfig(dict, metaclass=ABCMeta):
 
     @abstractmethod
     def _validate_config(self):
-        pass
-
-
-class BaseStressTestPlayer(metaclass=ABCMeta):
-    @abstractmethod
-    def run_player(self):
         pass

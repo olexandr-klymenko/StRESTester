@@ -11,7 +11,7 @@ from actions_registry import ActionsRegistry
 from jinja2 import Template
 
 __all__ = ['parse_scenario_template', 'parse_scenario_template', 'async_timeit_decorator', 'timeit_decorator',
-           'get_prepare_request_kwargs']
+           'get_prepare_request_kwargs', 'get_users']
 
 logger = getLogger('asyncio')
 
@@ -57,6 +57,8 @@ async def parse_scenario_template(template_root: ET.Element, scenario_kwargs):
             except (NameError, SyntaxError):
                 parsed_kwargs[node.tag] = node.text
 
+        parsed_kwargs['username'] = scenario_kwargs['username']
+
         if return_variable:
             scenario_kwargs[return_variable] = await coro(*parsed_args, **parsed_kwargs)
         else:
@@ -68,3 +70,7 @@ def get_prepare_request_kwargs(kwarg_info: Dict):
     serializable = {key: json.loads(value) for key, value in _kwargs.items() if key in SERIALIZABLE_ARGS}
     _kwargs.update(serializable)
     return _kwargs
+
+
+def get_users(username, users_number, user_number_multiplier):
+    return ["%s_%s" % (username, idx + (user_number_multiplier - 1) * users_number) for idx in range(users_number)]

@@ -25,7 +25,8 @@ class HTTPCodesDescription:
     _use_swagger = False
 
     @classmethod
-    def init(cls, loop: asyncio.AbstractEventLoop, config: Dict, use_swagger):
+    def init(cls, config: Dict, use_swagger):
+        loop = asyncio.get_event_loop()
         if not cls._info and use_swagger:
             loop.run_until_complete(cls._do_init(config))
             logger.info("Swagger info has been generated")
