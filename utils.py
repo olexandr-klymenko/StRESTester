@@ -2,13 +2,16 @@ import asyncio
 import timeit
 from logging import getLogger
 from xml.etree import ElementTree as ET
+import json
+from typing import Dict
 
-from constants import RETURN
+from constants import RETURN, REQUEST_ARGS, SERIALIZABLE_ARGS
 from counter import StatsCounter
 from actions_registry import ActionsRegistry
 from jinja2 import Template
 
-__all__ = ['parse_scenario_template', 'parse_scenario_template', 'async_timeit_decorator', 'timeit_decorator']
+__all__ = ['parse_scenario_template', 'parse_scenario_template', 'async_timeit_decorator', 'timeit_decorator',
+           'get_prepare_request_kwargs']
 
 logger = getLogger('asyncio')
 
@@ -40,7 +43,7 @@ async def parse_scenario_template(template_root: ET.Element, scenario_kwargs):
 
     for child in template_root:
         parsed_args = []
-        parsed_kwargs = {}
+        parsed_kwargs = {'xml': ET.tostring(child)}
         action_name = child.tag
         coro = ActionsRegistry.get_action(action_name)
         if action_name == 'rest':
@@ -50,10 +53,7 @@ async def parse_scenario_template(template_root: ET.Element, scenario_kwargs):
 
         for node in child:
             try:
-                # parsed_kwargs[node.tag] = eval(node.text, globals(), scenario_kwargs)
-
-                template = Template(node.text)
-                parsed_kwargs[node.tag] = template.render(**scenario_kwargs)
+                parsed_kwargs[node.tag] = Template(node.text).render(**scenario_kwargs)
             except (NameError, SyntaxError):
                 parsed_kwargs[node.tag] = node.text
 
@@ -61,3 +61,10 @@ async def parse_scenario_template(template_root: ET.Element, scenario_kwargs):
             scenario_kwargs[return_variable] = await coro(*parsed_args, **parsed_kwargs)
         else:
             await coro(*parsed_args, **parsed_kwargs)
+
+
+def get_prepare_request_kwargs(kwarg_info: Dict):
+    _kwargs = {key: value for key, value in kwarg_info.items() if key in REQUEST_ARGS}
+    serializable = {key: json.loads(value) for key, value in _kwargs.items() if key in SERIALIZABLE_ARGS}
+    _kwargs.update(serializable)
+    return _kwargs

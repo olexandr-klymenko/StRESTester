@@ -11,7 +11,6 @@ from actions_registry import ActionsRegistry
 from version import version
 import actions
 
-# TODO implement jinja2 instead of DIY template
 # TODO implement multiprocessing flow
 # TODO add doc strings
 

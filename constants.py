@@ -15,3 +15,6 @@ CYCLES = 'cycles'
 
 MAX_RETRY = 10
 RETRY_DELAY = 1  # seconds
+
+REQUEST_ARGS = ['url', 'method', 'data', 'params', 'headers']
+SERIALIZABLE_ARGS = ['data', 'params', 'headers']

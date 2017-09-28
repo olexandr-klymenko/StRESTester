@@ -2,6 +2,7 @@ import asyncio
 import json
 from logging import getLogger
 from typing import Dict, Union
+import sys
 
 from aiohttp import ClientSession
 from aiohttp.client_exceptions import ClientConnectorError, ClientOSError, ClientResponseError
@@ -11,7 +12,7 @@ from constants import MAX_RETRY, RETRY_DELAY
 from counter import StatsCounter
 from actions_registry import register_action_decorator
 from codes_description import HTTPCodesDescription
-from utils import async_timeit_decorator
+from utils import async_timeit_decorator, get_prepare_request_kwargs
 
 
 logger = getLogger('asyncio')
@@ -39,12 +40,8 @@ async def async_rest_call(name, **kwargs) -> Union[str, bytes]:
 
 @async_timeit_decorator
 async def async_http_request(name, session: ClientSession, **kwargs) -> str:
-    print(json.loads(kwargs.get('data')))
-    async with session.request(method=kwargs['method'],
-                               url=kwargs['url'],
-                               data=json.loads(kwargs.get('data')),
-                               headers=kwargs.get('headers'),
-                               params=kwargs.get('params')) as resp:
+    _kwargs = get_prepare_request_kwargs(kwargs)
+    async with session.request(**_kwargs) as resp:
         resp_data = await resp.text()
         description = HTTPCodesDescription.get_description(resp.status, **kwargs)
         logger.info("'%s' %s %s, status: %s, description: %s\n\tpayload: %s\n\tparams: %s\n\tresponse data: %s" %
@@ -65,12 +62,10 @@ async def async_sleep(sec):
 
 
 @register_action_decorator('get')
-async def get_value(info: Union[str, Dict], key: str):
-    assert info != "", 'Incorrect dictionary'
+async def get_value(info: Union[str, Dict], key: str, **kwargs):
+    info = str(info).replace("'", "\"")
     try:
-        if isinstance(info, dict):
-            info = json.dumps(info)
         return json.loads(info)[key]
     except TypeError:
-        logger.error("Unexpected value of 'info'. Expected: dict(), got: %s" % info)
-        raise
+        sys.stdout.write(kwargs['xml'].decode())
+        raise ValueError('Unexpected HTTP response or incorrect dictionary name in scenario')

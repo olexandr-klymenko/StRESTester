@@ -1,4 +1,8 @@
+from logging import getLogger
+
 __all__ = ['ActionsRegistry', 'register_action_decorator']
+
+logger = getLogger('asyncio')
 
 
 class ActionsRegistry:
@@ -10,8 +14,10 @@ class ActionsRegistry:
 
     @classmethod
     def get_action(cls, action_name):
+        if action_name not in cls._registry:
+            raise KeyError("Action '%s' is not registered. Valid actions: %s" % (action_name, cls.get_actions()))
         return cls._registry[action_name]
-    
+
     @classmethod
     def get_actions(cls):
         return list(cls._registry)

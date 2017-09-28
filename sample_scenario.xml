@@ -9,14 +9,15 @@
         <url>{{ auth }}/tokens/</url>
         <data>{"login": "{{ username }}", "password": "{{ password }}"}</data>
     </rest>
-    <rest name="Login" return="jwt_token">
+    <rest name="Login" return="jwt_token_info">
         <method>POST</method>
         <url>{{ api }}/users/login/</url>
         <data>{{ auth_token }}</data>
-        <headers>{'content-type': 'application/json'}</headers>
+        <raw>True</raw>
+        <headers>{"content-type": "application/json"}</headers>
     </rest>
     <get return="jwt_token">
-        <info>jwt_token</info>
+        <info>{{ jwt_token_info }}</info>
         <key>token</key>
     </get>
     <rest name="Create Profile" return="user_info">
@@ -27,15 +28,15 @@
         <raw>True</raw>
     </rest>
     <get return="profile_info">
-        <info>user_info</info>
+        <info>{{ user_info }}</info>
         <key>profile</key>
     </get>
     <get return="profile_id">
-        <info>profile_info</info>
+        <info>{{ profile_info }}</info>
         <key>profile_id</key>
     </get>
     <get return="user_id">
-        <info>profile_info</info>
+        <info>{{ profile_info }}</info>
         <key>user_id</key>
     </get>
     <repeat cycles="10">
