@@ -1,6 +1,6 @@
 import os
 from logging import getLogger
-from typing import Tuple, List
+from typing import List
 from multiprocessing import connection
 
 from counter import StatsCounter
@@ -9,14 +9,15 @@ from codes_description import HTTPCodesDescription
 from player import StressTestPlayer
 from configure_logging import configure_logging
 from constants import ST_CONFIG_PATH, ST_SCENARIO_PATH, TEST_USER_NAME, USERS_NUMBER
-import actions # don't remove: registering actions
+import actions
 
 configure_logging()
 
 logger = getLogger(__name__)
 
 
-def main(worker_index, conn: connection) -> Tuple:
+def worker(worker_index: int, conn: connection):
+    logger.info(actions.MESSAGE)
     scenario_path = os.environ[ST_SCENARIO_PATH]
     config_path = os.environ[ST_CONFIG_PATH]
     _config = StressTestConfig(config_path)
@@ -27,12 +28,9 @@ def main(worker_index, conn: connection) -> Tuple:
     player = StressTestPlayer(config=_config, scenario_path=scenario_path, test_users=test_users)
     try:
         player.run_player()
-    finally:
-        logger.info("Time metrics: %s" % StatsCounter.get_averages())
-        logger.info("Errors metrics: %s" % dict(StatsCounter.get_errors()))
 
-    conn.send((StatsCounter.get_averages(), dict(StatsCounter.get_errors())))
-    conn.close()
+    finally:
+        conn.send((StatsCounter.get_averages(), dict(StatsCounter.get_errors())))
 
 
 def _get_users(users_number, worker_index) -> List:

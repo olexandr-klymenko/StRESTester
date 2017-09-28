@@ -16,6 +16,8 @@ from utils import async_timeit_decorator, get_prepare_request_kwargs
 
 logger = getLogger('asyncio')
 
+MESSAGE = "Registering actions ..."
+
 
 @register_action_decorator('rest')
 async def async_rest_call(name, **kwargs) -> Union[str, bytes]:
@@ -30,7 +32,7 @@ async def async_rest_call(name, **kwargs) -> Union[str, bytes]:
                 logger.warning(str(err))
                 StatsCounter.append_error_metric(action_name=name)
                 attempts_left -= 1
-                await asyncio.sleep(RETRY_DELAY)
+                await asyncio.sleep(RETRY_DELAY)  # TODO test errors
                 continue
             else:
                 return resp_data

@@ -3,16 +3,18 @@ import os
 
 from invoke import task
 
+import actions
 from actions_registry import ActionsRegistry
 from configure_logging import configure_logging
 from constants import *
 from report import StressTestReport
 from stress_test_config import StressTestConfig
 from version import version
-from worker import main
-
+from worker import worker
 
 # TODO add doc strings
+
+print(actions.MESSAGE)
 
 
 @task
@@ -28,7 +30,7 @@ def run(_, scenario, config):
     report_metrics = []
     for index in range(1, _config[WORKERS_NUMBER] + 1):
         parent_conn, child_conn = mp.Pipe()
-        workers_info[index] = parent_conn, mp.Process(target=main, args=(index, child_conn))
+        workers_info[index] = parent_conn, mp.Process(target=worker, args=(index, child_conn))
 
     for _, (parent_conn, process) in workers_info.items():
         process.start()
@@ -39,9 +41,10 @@ def run(_, scenario, config):
     for _, (parent_conn, process) in workers_info.items():
         process.join()
 
-    report = StressTestReport(report_metrics)  # TODO finish report class
+    report = StressTestReport(report_metrics)
+    report.process_metrics()
 
 
 @task
-def actions(_, ):
+def getactions(_, ):
     print(ActionsRegistry.get_actions())
