@@ -23,4 +23,3 @@ REQUEST_ARGS = ['url', 'method', 'data', 'params', 'headers']
 SERIALIZABLE_ARGS = ['data', 'params', 'headers']
 
 ST_CONFIG_PATH = 'ST_CONFIG_PATH'
-ST_SCENARIO_PATH = 'ST_SCENARIO_PATH'

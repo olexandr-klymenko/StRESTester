@@ -1,6 +1,6 @@
 import asyncio
-from copy import deepcopy
-from typing import Dict, AnyStr, List
+
+from typing import Dict, List
 from xml.etree import ElementTree as ET
 
 from jinja2 import Template
@@ -13,28 +13,10 @@ __all__ = ['StressTestPlayer']
 
 
 class StressTestPlayer:
-    def __init__(self, config: Dict, scenario_path: AnyStr, test_users: List):
+    def __init__(self, config: Dict, scenario_xml_root: ET.Element, test_users: List):
         self._config = config
-        self._scenario_path = scenario_path
+        self._scenario_xml_root = scenario_xml_root
         self._test_users = test_users
-        self._scenario_xml_root = self._get_parsed_scenario_root()
-
-    def _get_parsed_scenario_root(self) -> ET.Element:
-        with open(self._scenario_path) as f:
-            _root = ET.parse(f).getroot()
-
-        def _parse_root(root: ET.Element, new_root=None) -> ET.Element:
-            for child in root:
-                if child.tag != REPEAT:
-                    if new_root is None:
-                        new_root = ET.Element('scenario')
-                    new_root.append(child)
-                else:
-                    for cycle in range(int(child.attrib[CYCLES])):
-                        _parse_root(deepcopy(child), new_root)
-            return new_root
-
-        return _parse_root(deepcopy(_root))
 
     @timeit_decorator
     def run_player(self):
