@@ -1,9 +1,10 @@
 import asyncio
 import json
 import timeit
-from logging import getLogger
-from typing import Dict
 from copy import deepcopy
+from logging import getLogger
+from multiprocessing import Queue
+from typing import Dict
 from xml.etree import ElementTree as ET
 
 from constants import REQUEST_ARGS, SERIALIZABLE_ARGS, REPEAT, CYCLES
@@ -62,3 +63,12 @@ def get_parsed_scenario_root(scenario_path) -> ET.Element:
         return new_root
 
     return _parse_root(deepcopy(_root))
+
+
+def progress_handler(queue: Queue, total_actions: int):
+    actions_left = total_actions
+    while actions_left:
+        queue.get()
+        actions_left -= 1
+        percentage = ' %2.2f%% ' % ((total_actions - actions_left) * 100 / total_actions)
+        print('{:-^80}'.format(percentage))

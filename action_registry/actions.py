@@ -45,10 +45,9 @@ async def async_http_request(name, session: ClientSession, **kwargs) -> str:
     async with session.request(timeout=REST_REQUEST_TIMEOUT, **_kwargs) as resp:
         resp_data = await resp.text()
         description = HTTPCodesDescription.get_description(resp.status, **kwargs)
-        logger.info("'%s' %s '%s' %s %s, status: %s, description: %s"
+        logger.info("'%s' '%s' %s %s, status: %s, description: %s"
                     "\n\tpayload: %s\n\tparams: %s\n\tresponse data: %s" %
                     (kwargs['username'],
-                     kwargs['progress'],
                      name,
                      kwargs['url'],
                      kwargs['method'].upper(),

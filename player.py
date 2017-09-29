@@ -1,5 +1,5 @@
 import asyncio
-
+from multiprocessing import Queue
 from typing import Dict, List
 from xml.etree import ElementTree as ET
 
@@ -13,10 +13,11 @@ __all__ = ['StressTestPlayer']
 
 
 class StressTestPlayer:
-    def __init__(self, config: Dict, scenario_xml_root: ET.Element, test_users: List):
+    def __init__(self, config: Dict, scenario_xml_root: ET.Element, test_users: List, progress_queue: Queue):
         self._config = config
         self._scenario_xml_root = scenario_xml_root
         self._test_users = test_users
+        self._progress_queue = progress_queue
 
     @timeit_decorator
     def run_player(self):
@@ -32,7 +33,6 @@ class StressTestPlayer:
                 loop.run_until_complete(self._parse_scenario_template(scenario_kwargs))
 
     async def _parse_scenario_template(self, scenario_kwargs: Dict):
-        template_length = len(self._scenario_xml_root)
         for idx, child in enumerate(self._scenario_xml_root):
             parsed_args = []
             parsed_kwargs = {'xml': ET.tostring(child)}
@@ -50,12 +50,12 @@ class StressTestPlayer:
                     parsed_kwargs[node.tag] = node.text
 
             parsed_kwargs['username'] = scenario_kwargs['username']
-            parsed_kwargs['progress'] = "{:10.1f}%".format(idx * 100 / template_length)
 
             if return_variable:
                 scenario_kwargs[return_variable] = await coro(*parsed_args, **parsed_kwargs)
             else:
                 await coro(*parsed_args, **parsed_kwargs)
+            self._progress_queue.put(0)
 
 # TODO add XML validation according to swagger_info
 # TODO add XML validation according to action list
