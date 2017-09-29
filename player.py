@@ -5,7 +5,7 @@ from xml.etree import ElementTree as ET
 
 from jinja2 import Template
 
-from actions_registry import ActionsRegistry
+from action_registry.registry import ActionsRegistry
 from constants import *
 from utils import timeit_decorator
 
@@ -16,8 +16,8 @@ class StressTestPlayer:
     def __init__(self, config: Dict, scenario_path: AnyStr, test_users: List):
         self._config = config
         self._scenario_path = scenario_path
-        self._scenario_xml_root = self._get_parsed_scenario_root()
         self._test_users = test_users
+        self._scenario_xml_root = self._get_parsed_scenario_root()
 
     def _get_parsed_scenario_root(self) -> ET.Element:
         with open(self._scenario_path) as f:

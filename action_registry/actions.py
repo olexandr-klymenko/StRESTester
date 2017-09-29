@@ -8,7 +8,7 @@ from typing import Dict, Union
 from aiohttp import ClientSession
 from aiohttp.client_exceptions import ClientConnectorError, ClientOSError, ClientResponseError
 
-from actions_registry import register_action_decorator
+from action_registry.registry import register_action_decorator
 from codes_description import HTTPCodesDescription
 from constants import MAX_RETRY, RETRY_DELAY, REST_REQUEST_TIMEOUT
 from counter import StatsCounter
@@ -16,7 +16,7 @@ from utils import async_timeit_decorator, get_prepare_request_kwargs
 
 logger = getLogger('asyncio')
 
-MESSAGE = "Registering actions ..."
+__all__ = []
 
 
 @register_action_decorator('rest')
@@ -58,6 +58,8 @@ async def async_http_request(name, session: ClientSession, **kwargs) -> str:
                      kwargs.get('params'),
                      resp_data))
         return resp_data
+
+# TODO handle HTTP error codes
 
 
 @register_action_decorator('sleep')

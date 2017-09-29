@@ -3,8 +3,7 @@ import os
 
 from invoke import task
 
-import actions
-from actions_registry import ActionsRegistry
+from action_registry.registry import *
 from configure_logging import configure_logging
 from constants import *
 from report import StressTestReport
@@ -13,8 +12,6 @@ from version import version
 from worker import worker
 
 # TODO add doc strings
-
-print(actions.MESSAGE)
 
 
 @task

@@ -17,11 +17,10 @@ CYCLES = 'cycles'
 
 MAX_RETRY = 10
 RETRY_DELAY = 1  # seconds
+REST_REQUEST_TIMEOUT = 30  # sec
 
 REQUEST_ARGS = ['url', 'method', 'data', 'params', 'headers']
 SERIALIZABLE_ARGS = ['data', 'params', 'headers']
 
 ST_CONFIG_PATH = 'ST_CONFIG_PATH'
 ST_SCENARIO_PATH = 'ST_SCENARIO_PATH'
-
-REST_REQUEST_TIMEOUT = 30  # sec
