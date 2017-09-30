@@ -16,7 +16,7 @@ CYCLES = 'cycles'
 
 MAX_RETRY = 10
 RETRY_DELAY = 1  # seconds
-REST_REQUEST_TIMEOUT = 30  # sec
+REST_REQUEST_TIMEOUT = 10  # sec
 
 REQUEST_ARGS = ['url', 'method', 'data', 'params', 'headers']
 SERIALIZABLE_ARGS = ['data', 'params', 'headers']

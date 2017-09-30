@@ -9,11 +9,12 @@ from action_registry.registry import ActionsRegistry
 from constants import *
 from report import StressTestReport
 from stress_test_config import StressTestConfig
-from utils import get_parsed_scenario_root, progress_handler
+from utils import get_parsed_scenario_root, progress_handler, StressTestProcess
 from version import version
 from worker import worker
 
 # TODO add doc strings
+# TODO implement web ui
 
 logger = logging.getLogger(__name__)
 out_hdlr = logging.StreamHandler(sys.stdout)
@@ -40,10 +41,10 @@ def run(_, scenario, config):
     report_metrics = []
     for index in range(1, cfg[WORKERS_NUMBER] + 1):
         parent_conn, child_conn = mp.Pipe()
-        workers_info[index] = parent_conn, mp.Process(target=worker, args=(index,
-                                                                           scenario_xml_root,
-                                                                           child_conn,
-                                                                           progress_queue))
+        workers_info[index] = parent_conn, StressTestProcess(target=worker, args=(index,
+                                                                                  scenario_xml_root,
+                                                                                  child_conn,
+                                                                                  progress_queue))
 
     for _, (parent_conn, process) in workers_info.items():
         process.start()
@@ -54,10 +55,20 @@ def run(_, scenario, config):
     for _, (parent_conn, process) in workers_info.items():
         process.join()
 
-    progress_process.join()
+    try:
+        for _, (parent_conn, process) in workers_info.items():
+            if process.exception:
+                error, traceback = process.exception
+                raise Exception(traceback)
 
-    report = StressTestReport(report_metrics)
-    report.process_metrics()
+    except Exception:
+        progress_process.terminate()
+        raise
+    else:
+        progress_process.join()
+    finally:
+        report = StressTestReport(report_metrics)
+        report.process_metrics()
 
 
 @task

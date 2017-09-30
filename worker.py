@@ -34,5 +34,3 @@ def worker(worker_index: int, scenario_xml_root: ET.Element, conn: connection, p
 def _get_users(users_number, worker_index) -> List:
     return ["%s_%s" % (TEST_USER_NAME, idx)
             for idx in range((worker_index - 1) * users_number, users_number * worker_index)]
-
-# TODO handle exception in children

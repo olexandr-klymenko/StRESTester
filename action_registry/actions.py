@@ -32,7 +32,7 @@ async def async_rest_call(name, **kwargs) -> Union[str, bytes]:
                 logger.warning(str(err))
                 StatsCounter.append_error_metric(action_name=name)
                 attempts_left -= 1
-                await asyncio.sleep(RETRY_DELAY)  # TODO test errors
+                await asyncio.sleep(RETRY_DELAY)
                 continue
             else:
                 return resp_data
@@ -56,9 +56,10 @@ async def async_http_request(name, session: ClientSession, **kwargs) -> str:
                      kwargs.get('data'),
                      kwargs.get('params'),
                      resp_data))
+        #  TODO: replace dirty hack
+        if resp.status not in list(range(200, 209)):
+            raise ClientResponseError(request_info=kwargs, history='', code=resp.status)
         return resp_data
-
-# TODO handle HTTP error codes
 
 
 @register_action_decorator('sleep')

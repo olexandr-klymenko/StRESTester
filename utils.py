@@ -1,6 +1,8 @@
 import asyncio
 import json
+import multiprocessing as mp
 import timeit
+import traceback
 from copy import deepcopy
 from logging import getLogger
 from multiprocessing import Queue
@@ -11,7 +13,7 @@ from constants import REQUEST_ARGS, SERIALIZABLE_ARGS, REPEAT, CYCLES
 from counter import StatsCounter
 
 __all__ = ['parse_scenario_template', 'async_timeit_decorator', 'timeit_decorator', 'get_prepare_request_kwargs',
-           'get_parsed_scenario_root']
+           'get_parsed_scenario_root', 'StressTestProcess']
 
 logger = getLogger('asyncio')
 
@@ -72,3 +74,25 @@ def progress_handler(queue: Queue, total_actions: int):
         actions_left -= 1
         percentage = ' %2.2f%% ' % ((total_actions - actions_left) * 100 / total_actions)
         print('{:-^80}'.format(percentage))
+
+
+class StressTestProcess(mp.Process):
+    def __init__(self, *args, **kwargs):
+        mp.Process.__init__(self, *args, **kwargs)
+        self._pconn, self._cconn = mp.Pipe()
+        self._exception = None
+
+    def run(self):
+        try:
+            mp.Process.run(self)
+            self._cconn.send(None)
+        except Exception as e:
+            tb = traceback.format_exc()
+            self._cconn.send((e, tb))
+            # raise e  # You can still rise this exception if you need to
+
+    @property
+    def exception(self):
+        if self._pconn.poll():
+            self._exception = self._pconn.recv()
+        return self._exception
