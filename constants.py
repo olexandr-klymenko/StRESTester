@@ -1,4 +1,4 @@
-PROJECT = 'StressTester'
+PROJECT = 'StRESTester'
 
 URLS = 'urls'
 USERS_NUMBER = 'users_number'
