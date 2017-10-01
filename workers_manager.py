@@ -21,6 +21,7 @@ class WorkerManager:
         self._init_workers()
         self._start_workers()
         self._receive_metrics()
+        self._join_workers()
         self._close_workers()
 
     def _init_progress_queue(self):
@@ -46,7 +47,7 @@ class WorkerManager:
         for _, (parent_conn, __) in self._workers_info.items():
             self._report_metrics.append(parent_conn.recv())
 
-    def join_workers(self):
+    def _join_workers(self):
         for _, (__, process) in self._workers_info.items():
             process.join()
 
