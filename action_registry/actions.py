@@ -12,7 +12,7 @@ from action_registry.registry import register_action_decorator
 from codes_description import HTTPCodesDescription
 from constants import MAX_RETRY, RETRY_DELAY, REST_REQUEST_TIMEOUT
 from counter import StatsCounter
-from utils import async_timeit_decorator, get_prepare_request_kwargs
+from utils import async_timeit_decorator, serialize
 
 logger = getLogger('asyncio')
 
@@ -21,6 +21,12 @@ __all__ = []
 
 @register_action_decorator('rest')
 async def async_rest_call(name, **kwargs) -> Union[str, bytes]:
+    """
+    The main action which performs HTTP REST requests to target resource
+    :param name:
+    :param kwargs:
+    :return:
+    """
     if kwargs.get('raw'):
         kwargs['data'] = json.dumps(kwargs['data'])
     attempts_left = MAX_RETRY
@@ -41,7 +47,14 @@ async def async_rest_call(name, **kwargs) -> Union[str, bytes]:
 
 @async_timeit_decorator
 async def async_http_request(name, session: ClientSession, **kwargs) -> str:
-    _kwargs = get_prepare_request_kwargs(kwargs)
+    """
+    Invokes aiohttp client session request
+    :param name:
+    :param session:
+    :param kwargs:
+    :return:
+    """
+    _kwargs = serialize(kwargs)
     async with session.request(timeout=REST_REQUEST_TIMEOUT, **_kwargs) as resp:
         resp_data = await resp.text()
         description = HTTPCodesDescription.get_description(resp.status, **kwargs)
@@ -69,6 +82,13 @@ async def async_sleep(sec):
 
 @register_action_decorator('get')
 async def get_value(info: Union[str, Dict], key: str, **kwargs):
+    """
+    Auxiliary action for processing responses like dictionary
+    :param info:
+    :param key:
+    :param kwargs:
+    :return:
+    """
     info = str(info).replace("'", "\"")
     try:
         return json.loads(info)[key]

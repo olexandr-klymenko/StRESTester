@@ -12,7 +12,7 @@ from xml.etree import ElementTree as ET
 from constants import REQUEST_ARGS, SERIALIZABLE_ARGS, REPEAT, CYCLES
 from counter import StatsCounter
 
-__all__ = ['parse_scenario_template', 'async_timeit_decorator', 'timeit_decorator', 'get_prepare_request_kwargs',
+__all__ = ['parse_scenario_template', 'async_timeit_decorator', 'timeit_decorator', 'serialize',
            'get_parsed_scenario_root', 'StressTestProcess']
 
 logger = getLogger('asyncio')
@@ -42,7 +42,12 @@ def timeit_decorator(func):
     return wrapper
 
 
-def get_prepare_request_kwargs(kwarg_info: Dict) -> Dict:
+def serialize(kwarg_info: Dict) -> Dict:
+    """
+    Accept key word arguments and serialize them for HTTP requests
+    :param kwarg_info:
+    :return:
+    """
     _kwargs = {key: value for key, value in kwarg_info.items() if key in REQUEST_ARGS}
     serializable = {key: json.loads(value) for key, value in _kwargs.items() if key in SERIALIZABLE_ARGS}
     _kwargs.update(serializable)
@@ -50,6 +55,11 @@ def get_prepare_request_kwargs(kwarg_info: Dict) -> Dict:
 
 
 def get_parsed_scenario_root(scenario_path) -> ET.Element:
+    """
+    Processes loops (REPEAT keyword) in stress test scenario and deflates them as if there no loops
+    :param scenario_path:
+    :return:
+    """
     with open(scenario_path) as f:
         _root = ET.parse(f).getroot()
 
@@ -68,6 +78,12 @@ def get_parsed_scenario_root(scenario_path) -> ET.Element:
 
 
 def progress_handler(queue: Queue, total_actions: int):
+    """
+    Gets message from progress queue and outputs progress percentage in the loop
+    :param queue:
+    :param total_actions:
+    :return:
+    """
     actions_left = total_actions
     while actions_left:
         queue.get()
@@ -77,6 +93,9 @@ def progress_handler(queue: Queue, total_actions: int):
 
 
 class StressTestProcess(mp.Process):
+    """
+    Customized process class intended to handle exceptions within worker
+    """
     def __init__(self, *args, **kwargs):
         mp.Process.__init__(self, *args, **kwargs)
         self._pconn, self._cconn = mp.Pipe()

@@ -14,6 +14,15 @@ configure_logging()
 
 
 def worker(worker_index: int, scenario_xml_root: ET.Element, conn: connection, progress_queue: Queue):
+    """
+    The function which is intended to run in separate process
+     as a target within multiprocessing.Process
+    :param worker_index:
+    :param scenario_xml_root:
+    :param conn:
+    :param progress_queue:
+    :return:
+    """
     config_path = os.environ[ST_CONFIG_PATH]
     _config = StressTestConfig(config_path)
     HTTPCodesDescription.init(_config, False)
@@ -32,5 +41,11 @@ def worker(worker_index: int, scenario_xml_root: ET.Element, conn: connection, p
 
 
 def _get_users(users_number, worker_index) -> List:
+    """
+    It figures out the list of users for given worker
+    :param users_number:
+    :param worker_index:
+    :return: list of user names
+    """
     return ["%s_%s" % (TEST_USER_NAME, idx)
             for idx in range((worker_index - 1) * users_number, users_number * worker_index)]

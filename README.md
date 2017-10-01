@@ -6,18 +6,23 @@ StRESTester is a Python tool for testing RESTful APIs compilant with [Swagger 1.
 
 ## Example Usage
 
-* create your config.json (there is sample_config.json)
-* create your scenario.xml (there is sample_scenario.xml)
-* python3 -m pip install requirements.txt
-* invoke run -c config.json -s scenario.xml
+* create your <b><i>config.json</i></b> (there is <i>sample_config.json</i>)
+* create your <b><i>scenario.xml</i></b> (there is <i>sample_scenario.xml</i>)
+* <b>python3 -m pip install requirements.txt</b>
+* <b>invoke run -c <i>config.json</i> -s <i>scenario.xml</i></b>
 
 ## Documentation
 
-* sample_config.json
+* <b><i>sample_config.json</i></b>
 Will be published soon
 
-* sample_scenario.xml
-Will be published soon
+* <b><i>sample_scenario.xml</i></b>
+The scenario is XML file which contains sequence of so called <i>actions</i>.
+Here are some action samples:
+
+## Roadmap
+* Implementing web socket logging handler for future web ui
+* Implement web ui for stress test scenario generation and running and better report  output
 
 
 ## Contributing
@@ -27,8 +32,3 @@ Will be published soon
 3. Commit your changes (`git commit -am 'Add some feature'`)
 4. Push to the branch (`git push origin my-new-feature`)
 5. Create new Pull Request
-
-## License
-
-Copyright (c) 2017, All rights reserved.
-Apache v2

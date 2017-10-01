@@ -6,6 +6,9 @@ logger = getLogger('asyncio')
 
 
 class ActionsRegistry:
+    """
+    Registry contains all available stress test scenario actions
+    """
     _registry = {}
 
     @classmethod
@@ -24,6 +27,11 @@ class ActionsRegistry:
 
 
 def register_action_decorator(action_name):
+    """
+    Decorator with argument "action_name" which registers functions as an stress test scenario action.
+    :param action_name:
+    :return:
+    """
     def helper(coro):
         ActionsRegistry.register_action(coro=coro, action_name=action_name)
         

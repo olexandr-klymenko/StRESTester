@@ -21,6 +21,9 @@ UNKNOWN = '!!! UNKNOWN !!!'
 
 
 class HTTPCodesDescription:
+    """
+    Class for figuring out status codes description from swagger json files
+    """
     _info = defaultdict(dict)
     _use_swagger = False
 

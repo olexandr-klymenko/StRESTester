@@ -21,6 +21,11 @@ class StressTestPlayer:
 
     @timeit_decorator
     def run_player(self):
+        """
+        Creates loop within given process worker, iterates over ITERATION NUMBER,
+         user names and runs action coroutines
+        :return:
+        """
         loop = asyncio.get_event_loop()
         for iteration in range(self._config[ITERATIONS_NUMBER]):
             for user_name in self._test_users:
@@ -33,6 +38,12 @@ class StressTestPlayer:
                 loop.run_until_complete(self._parse_scenario_template(scenario_kwargs))
 
     async def _parse_scenario_template(self, scenario_kwargs: Dict):
+        """
+        Parser which converts parsed scenario actions into asyncio coroutines and awaits them.
+        After awaiting coro puts message (0) to progress queue
+        :param scenario_kwargs:
+        :return:
+        """
         for idx, child in enumerate(self._scenario_xml_root):
             parsed_args = []
             parsed_kwargs = {'xml': ET.tostring(child)}

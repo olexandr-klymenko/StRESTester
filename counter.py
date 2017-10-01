@@ -7,6 +7,10 @@ __all__ = ['StatsCounter']
 # TODO implement report generation
 
 class StatsCounter:
+    """
+    Class for dealing with stress test scenario actions' metrics within separate process.
+    It collects them and finally returns to for StressTestReport to process
+    """
     _time_counter = {}
     _error_counter = defaultdict(int)
 

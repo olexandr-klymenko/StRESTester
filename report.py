@@ -3,6 +3,9 @@ from collections import Counter
 
 
 class StressTestReport:
+    """
+    Class for aggregation stress test metrics and report generation
+    """
     def __init__(self, metrics: List):
         self._metrics = metrics
 
