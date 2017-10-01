@@ -115,3 +115,4 @@ class StressTestProcess(mp.Process):
         if self._pconn.poll():
             self._exception = self._pconn.recv()
         return self._exception
+
