@@ -1,6 +1,6 @@
 from typing import List
 from collections import Counter
-
+from pprint import pprint
 
 class StressTestReport:
     """
@@ -18,8 +18,9 @@ class StressTestReport:
             am_counters.update(action_metrics.keys())
             err_sums.update(error_metrics)
 
-        print("Action metrics (averages): %s"
-              % {metric: float(am_sums[metric])/am_counters[metric] for metric in am_sums.keys()})
-        print("Error metrics: %s" % dict(err_sums))
+        print("Action metrics (averages):")
+        pprint({metric: float(am_sums[metric])/am_counters[metric] for metric in am_sums.keys()}, indent=4)
+        print("Error metrics:")
+        pprint(dict(err_sums), indent=4)
 
 # TODO implement JMEter like report
