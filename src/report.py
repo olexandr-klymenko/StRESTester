@@ -2,6 +2,7 @@ from typing import List
 from collections import Counter
 from pprint import pprint
 
+
 class StressTestReport:
     """
     Class for aggregation stress test metrics and report generation

@@ -6,8 +6,8 @@ from invoke import task
 
 from action_registry.registry import ActionsRegistry
 from constants import *
+from scenario import Scenario
 from stress_test_config import StressTestConfig
-from utils import get_parsed_scenario_root
 from version import version
 from workers_manager import WorkerManager
 
@@ -25,7 +25,7 @@ logger.setLevel(logging.INFO)
 @task
 def run(_, scenario, config):
     logger.info("Starting '%s' version %s ..." % (PROJECT, version))
-    scenario_xml_root = get_parsed_scenario_root(scenario)
+    scenario_xml_root = Scenario(scenario)
 
     cfg = StressTestConfig(config)
     os.environ[ST_CONFIG_PATH] = config

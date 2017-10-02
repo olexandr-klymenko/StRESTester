@@ -3,17 +3,14 @@ import json
 import multiprocessing as mp
 import timeit
 import traceback
-from copy import deepcopy
 from logging import getLogger
 from multiprocessing import Queue
 from typing import Dict
-from xml.etree import ElementTree as ET
 
-from constants import REQUEST_ARGS, SERIALIZABLE_ARGS, REPEAT, CYCLES
+from constants import REQUEST_ARGS, SERIALIZABLE_ARGS
 from counter import StatsCounter
 
-__all__ = ['parse_scenario_template', 'async_timeit_decorator', 'timeit_decorator', 'serialize',
-           'get_parsed_scenario_root', 'StressTestProcess']
+__all__ = ['parse_scenario_template', 'async_timeit_decorator', 'timeit_decorator', 'serialize', 'StressTestProcess']
 
 logger = getLogger('asyncio')
 
@@ -55,29 +52,6 @@ def serialize(kwarg_info: Dict) -> Dict:
     return _kwargs
 
 
-def get_parsed_scenario_root(scenario_path) -> ET.Element:
-    """
-    Processes loops (REPEAT keyword) in stress test scenario and deflates them as if there no loops
-    :param scenario_path:
-    :return:
-    """
-    with open(scenario_path) as f:
-        _root = ET.parse(f).getroot()
-
-    def _parse_root(root: ET.Element, new_root=None) -> ET.Element:
-        for child in root:
-            if child.tag != REPEAT:
-                if new_root is None:
-                    new_root = ET.Element('scenario')
-                new_root.append(child)
-            else:
-                for cycle in range(int(child.attrib[CYCLES])):
-                    _parse_root(deepcopy(child), new_root)
-        return new_root
-
-    return _parse_root(deepcopy(_root))
-
-
 def progress_handler(queue: Queue, total_actions: int):
     """
     Gets message from progress queue and outputs progress percentage in the loop
@@ -116,4 +90,3 @@ class StressTestProcess(mp.Process):
         if self._pconn.poll():
             self._exception = self._pconn.recv()
         return self._exception
-
