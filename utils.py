@@ -24,6 +24,7 @@ def async_timeit_decorator(coro: asyncio.coroutine) -> asyncio.coroutine:
         result = await coro(*args, **kwargs)
         action_name = args[0]
         time_metric = timeit.default_timer() - start
+        logger.debug("Action '%s' execution time: %s" % (action_name, time_metric))
         StatsCounter.append_time_metric((action_name, time_metric))
         return result
 

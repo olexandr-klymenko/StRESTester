@@ -58,17 +58,17 @@ async def async_http_request(name, session: ClientSession, **kwargs) -> str:
     async with session.request(timeout=REST_REQUEST_TIMEOUT, **_kwargs) as resp:
         resp_data = await resp.text()
         description = HTTPCodesDescription.get_description(resp.status, **kwargs)
-        logger.info("'%s' '%s' %s %s, status: %s, description: %s"
-                    "\n\tpayload: %s\n\tparams: %s\n\tresponse data: %s" %
-                    (kwargs['username'],
-                     name,
-                     kwargs['url'],
-                     kwargs['method'].upper(),
-                     resp.status,
-                     description,
-                     kwargs.get('data'),
-                     kwargs.get('params'),
-                     resp_data))
+        logger.debug("'%s' '%s' %s %s, status: %s, description: %s"
+                     "\n\tpayload: %s\n\tparams: %s\n\tresponse data: %s" %
+                     (kwargs['username'],
+                      name,
+                      kwargs['url'],
+                      kwargs['method'].upper(),
+                      resp.status,
+                      description,
+                      kwargs.get('data'),
+                      kwargs.get('params'),
+                      resp_data))
         #  TODO: replace dirty hack
         if resp.status not in list(range(200, 209)):
             raise ClientResponseError(request_info=kwargs, history='', code=resp.status)
