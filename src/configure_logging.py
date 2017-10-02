@@ -2,6 +2,8 @@ import logging
 from logging import INFO
 from os import environ
 
+__all__ = ['configure_logging']
+
 
 def configure_logging():
     log_level = environ.get('LOG_LEVEL', INFO)
