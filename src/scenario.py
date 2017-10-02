@@ -2,13 +2,19 @@ from copy import deepcopy
 from xml.etree import ElementTree as ET
 
 from action_registry.registry import ActionsRegistry
-from constants import REPEAT, CYCLES
+from constants import REPEAT, CYCLES, RETURN
 
 
 __all__ = ['Scenario']
 
 
+MANDATORY_ATTRIBUTES = ['name']
+AVAILABLE_ATTRIBUTES = [RETURN]
+
+
 class Scenario:
+    _registered_actions = ActionsRegistry.get_actions()
+
     def __init__(self, path: str):
         self._path = path
         self._root = self._parse()
@@ -28,11 +34,10 @@ class Scenario:
             _root = ET.parse(f).getroot()
 
         def _parse_root(root: ET.Element, new_root=None) -> ET.Element:
+
             for child in root:
                 if child.tag != REPEAT:
-                    registered_actions = ActionsRegistry.get_actions()
-                    assert child.tag in registered_actions,\
-                        'Scenario action "%s" not in action list %s' % (child.tag, registered_actions)
+                    self._validate_child(child)
                     if new_root is None:
                         new_root = ET.Element('scenario')
                     new_root.append(child)
@@ -42,3 +47,15 @@ class Scenario:
             return new_root
 
         return _parse_root(deepcopy(_root))
+
+    def _validate_child(self, child: ET.Element):
+        assert child.tag in self._registered_actions, \
+            'Scenario action "%s" not in action list %s' % (child.tag, self._registered_actions)
+
+        assert MANDATORY_ATTRIBUTES in child.keys(), 'Mandatory attributes missing'
+
+        assert child.keys() in MANDATORY_ATTRIBUTES + AVAILABLE_ATTRIBUTES
+
+        nodes = [node.tag for node in child]
+        assert len(nodes) == len(set(nodes)), 'There is duplicated arguments in action "%s: %s != %s"'\
+                                              % (child.tag, list(nodes), list(set(nodes)))
