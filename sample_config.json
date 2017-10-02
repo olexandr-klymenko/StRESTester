@@ -1,13 +1,9 @@
 {
   "urls": {
-    "api":  "http://127.0.0.1:8000",
-    "auth": "http://10.10.7.30:8000"
+    "api_url_1":  "http://127.0.0.1:8000",
+    "api_url_2": "http://127.0.0.1:8080"
   },
   "users_number": 1,
   "iterations_number": 1,
-  "workers_number": 5,
-  "blueprints_info": {
-    "api": ["/users/", "/dedicated/", "/debug/", "/admin/"],
-    "auth": ["/"]
-    }
+  "workers_number": 1
 }

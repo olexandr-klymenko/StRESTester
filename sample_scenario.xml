@@ -1,30 +1,30 @@
 <scenario>
     <rest name="Create User">
         <method>POST</method>
-        <url>{{ auth }}/users/</url>
+        <url>{{ api_url_1 }}/accounts/</url>
         <data>{"login": "{{ username }}", "password": "{{ password }}"}</data>
     </rest>
-    <rest name="Get Auth Token" return="auth_token">
+    <rest name="Get Auth Token" return="token_1">
         <method>POST</method>
-        <url>{{ auth }}/tokens/</url>
+        <url>{{ api_url_1 }}/tokens/</url>
         <data>{"login": "{{ username }}", "password": "{{ password }}"}</data>
     </rest>
-    <rest name="Login" return="jwt_token_info">
+    <rest name="Login" return="token_2_info">
         <method>POST</method>
-        <url>{{ api }}/users/login/</url>
-        <data>{{ auth_token }}</data>
+        <url>{{ api_url_2 }}/accounts/login/</url>
+        <data>{{ token_1 }}</data>
         <raw>True</raw>
         <headers>{"content-type": "application/json"}</headers>
     </rest>
-    <get return="jwt_token">
-        <info>{{ jwt_token_info }}</info>
+    <get return="token_2">
+        <info>{{ token_2_info }}</info>
         <key>token</key>
     </get>
     <rest name="Create Profile" return="user_info">
         <method>POST</method>
-        <url>{{ api }}/users/profile/</url>
+        <url>{{ api_url_2 }}/accounts/profile/</url>
         <data>{"nickname": "{{ username }}"}</data>
-        <headers>{"content-type": "application/json", "Authorization": "Bearer: {{ jwt_token }}"}</headers>
+        <headers>{"content-type": "application/json", "Token": "{{ token_2 }}"}</headers>
         <raw>True</raw>
     </rest>
     <get return="profile_info">
@@ -42,19 +42,19 @@
     <repeat cycles="5">
         <rest name="Set user wallet to 10">
             <method>PUT</method>
-            <url>{{ api }}/admin/wallet/{{ user_id }}</url>
+            <url>{{ api }}/super/bank/{{ user_id }}</url>
             <data>{"amount": 10}</data>
             <headers>{"content-type": "application/json"}</headers>
             <raw>True</raw>
         </rest>
         <rest name="Get user wallet">
             <method>GET</method>
-            <url>{{ api }}/users/wallet/</url>
-            <headers>{"content-type": "application/json", "Authorization": "Bearer: {{ jwt_token }}" }</headers>
+            <url>{{ api_url_2 }}/accounts/bank/</url>
+            <headers>{"content-type": "application/json", "Token": "{{ token_2 }}" }</headers>
         </rest>
         <rest name="Patch money amount">
             <method>PATCH</method>
-            <url>{{ api }}/admin/wallet/{{ user_id }}</url>
+            <url>{{ api_url_2 }}/super/bank/{{ user_id }}</url>
             <data>{"amount": 10}</data>
             <headers>{"content-type": "application/json"}</headers>
             <raw>True</raw>
@@ -62,11 +62,11 @@
     </repeat>
     <rest name="Delete profile">
         <method>DELETE</method>
-        <url>{{ api }}/admin/profiles/</url>
+        <url>{{ api_url_2 }}/super/profiles/</url>
         <params>{"profile_id": "{{ profile_id }}", "user_id": "{{ user_id }}"}</params>
     </rest>
     <rest name="Delete User">
         <method>DELETE</method>
-        <url>{{ auth }}/users/{{ username }}</url>
+        <url>{{ api_url_1 }}/accounts/{{ username }}</url>
     </rest>
 </scenario>
