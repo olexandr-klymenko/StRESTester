@@ -16,7 +16,7 @@
         <raw>True</raw>
         <headers>{"content-type": "application/json"}</headers>
     </rest>
-    <get return="token_2">
+    <get name="get token_2" return="token_2">
         <info>{{ token_2_info }}</info>
         <key>token</key>
     </get>
@@ -27,15 +27,15 @@
         <headers>{"content-type": "application/json", "Token": "{{ token_2 }}"}</headers>
         <raw>True</raw>
     </rest>
-    <get return="profile_info">
+    <get name="get profile_info" return="profile_info">
         <info>{{ user_info }}</info>
         <key>profile</key>
     </get>
-    <get return="profile_id">
+    <get name="get profile_id" return="profile_id">
         <info>{{ profile_info }}</info>
         <key>profile_id</key>
     </get>
-    <get return="user_id">
+    <get name="get user_id" return="user_id">
         <info>{{ profile_info }}</info>
         <key>user_id</key>
     </get>

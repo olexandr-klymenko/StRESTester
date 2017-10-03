@@ -49,12 +49,18 @@ class Scenario:
         return _parse_root(deepcopy(_root))
 
     def _validate_child(self, child: ET.Element):
+        action_attributes = set(child.keys())
+        mandatory_attributes = set(MANDATORY_ATTRIBUTES)
+        optional_attributes = set(MANDATORY_ATTRIBUTES + AVAILABLE_ATTRIBUTES)
+
         assert child.tag in self._registered_actions, \
             'Scenario action "%s" not in action list %s' % (child.tag, self._registered_actions)
 
-        assert MANDATORY_ATTRIBUTES in child.keys(), 'Mandatory attributes missing'
+        assert mandatory_attributes.issubset(action_attributes),\
+            "Mandatory attributes missing in '%s'" % str(mandatory_attributes - action_attributes)
 
-        assert child.keys() in MANDATORY_ATTRIBUTES + AVAILABLE_ATTRIBUTES
+        assert action_attributes.issubset(optional_attributes),\
+            "There is at least one invalid attribute: '%s'" % str(action_attributes - optional_attributes)
 
         nodes = [node.tag for node in child]
         assert len(nodes) == len(set(nodes)), 'There is duplicated arguments in action "%s: %s != %s"'\

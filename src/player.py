@@ -69,4 +69,3 @@ class StressTestPlayer:
             self._progress_queue.put(0)
 
 # TODO add XML validation according to swagger_info
-# TODO add XML validation according to action list
