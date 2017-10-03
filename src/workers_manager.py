@@ -1,5 +1,4 @@
-import multiprocessing as mp
-from multiprocessing import Queue
+from multiprocessing import Queue, Process, Pipe
 
 from report import StressTestReport
 from utils import progress_handler, StressTestProcess
@@ -25,14 +24,14 @@ class WorkerManager:
         self._close_workers()
 
     def _init_progress_queue(self):
-        self._progress_queue = mp.Queue()
-        self._progress_process = mp.Process(target=progress_handler, args=(self._progress_queue,
-                                                                           self._total_actions))
+        self._progress_queue = Queue()
+        self._progress_process = Process(target=progress_handler, args=(self._progress_queue,
+                                                                        self._total_actions))
         self._progress_process.start()
 
     def _init_workers(self):
         for index in range(1, self._workers_number + 1):
-            parent_conn, child_conn = mp.Pipe()
+            parent_conn, child_conn = Pipe()
             self._workers_info[index] = parent_conn, StressTestProcess(target=worker,
                                                                        args=(index,
                                                                              self._scenario_xml_root,
