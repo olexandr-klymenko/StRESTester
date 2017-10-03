@@ -4,6 +4,13 @@
 
 StRESTester is a Python tool for testing RESTful APIs compilant with [Swagger 1.2](https://github.com/swagger-api/swagger-spec/blob/master/versions/1.2.md) or [Swagger 2.0](https://github.com/swagger-api/swagger-spec/blob/master/versions/2.0.md) specification.
 
+## Dependencies
+* validators
+* aiohttp
+* invoke
+* jinja2
+
+
 ## Example Usage
 
 * create your <b><i>config.json</i></b> (there is <i>sample_config.json</i>)
@@ -110,6 +117,7 @@ StRESTester is a Python tool for testing RESTful APIs compilant with [Swagger 1.
 * each action must have mandatory attribute <b>_'name'_</b>
 * attribute <b>_'return'_</b> intended for assignment return of action to given variable
 * node <b>_'repeat'_</b> allows to create loops of scenario snippets, meaning of the attribute <b>_'cycles'_</b> is obvious
+* jinja2 template is used to define action arguments
 
 # Report output
 * report output looks like
