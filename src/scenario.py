@@ -13,6 +13,7 @@ OPTIONAL_ATTRIBUTES = [RETURN]
 
 class Scenario:
     _registered_actions = ActionsRegistry.get_actions()
+    _validated_steps = []
 
     def __init__(self, path: str):
         self._path = path
@@ -36,10 +37,14 @@ class Scenario:
 
             for child in root:
                 if child.tag != REPEAT:
-                    self._validate_child(child)
+                    if ET.tostring(child) not in self._validated_steps:
+                        self._validate_child(child)
+                        self._validated_steps.append(ET.tostring(child))
+
                     if new_root is None:
                         new_root = ET.Element('scenario')
                     new_root.append(child)
+
                 else:
                     for cycle in range(int(child.attrib[CYCLES])):
                         _parse_root(deepcopy(child), new_root)
@@ -70,6 +75,7 @@ class Scenario:
 
             assert len(nodes) == len(set(nodes)), 'There is duplicated arguments in action "%s: %s != %s"' \
                                                   % (child.tag, list(nodes), list(set(nodes)))
+
         except AssertionError:
             pprint(ET.tostring(child).decode(), indent=4)
             raise
