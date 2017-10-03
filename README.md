@@ -119,7 +119,7 @@ StRESTester is a Python tool for testing RESTful APIs compilant with [Swagger 1.
 * node <b>_'repeat'_</b> allows to create loops of scenario snippets, meaning of the attribute <b>_'cycles'_</b> is obvious
 * jinja2 template is used to define action arguments
 
-# Report output
+## Report output
 * report output looks like
 <pre><code>
 Action metrics (averages):
@@ -136,6 +136,22 @@ Error metrics:
 {}
 </code></pre>
 values are excecution time of <b>rest</b> actions in seconds
+
+## Extending actions by custom actions
+* create python module in <b>_src/action_registry_</b>
+* here is an example of custom action:
+<pre><code>
+import asyncio
+
+from action_registry.registry import register_action_decorator
+
+__all__ = ['async_sleep']
+
+
+@register_action_decorator(action_name='sleep')
+async def async_sleep(sec):
+    await asyncio.sleep(sec)
+</code></pre>
 
 ## Roadmap
 * Implement web ui for stress test scenario generation and running and better report  output
