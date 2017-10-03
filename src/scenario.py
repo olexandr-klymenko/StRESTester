@@ -12,6 +12,9 @@ OPTIONAL_ATTRIBUTES = [RETURN]
 
 
 class Scenario:
+    """
+    Iterable container for stress test scenario steps
+    """
     _registered_actions = ActionsRegistry.get_actions()
     _validated_steps = []
 
@@ -30,6 +33,10 @@ class Scenario:
             yield el
 
     def _parse(self) -> ET.Element:
+        """
+        Unpack loops into plain xml root of scenario
+        :return:
+        """
         with open(self._path) as f:
             _root = ET.parse(f).getroot()
 
@@ -53,6 +60,11 @@ class Scenario:
         return _parse_root(deepcopy(_root))
 
     def _validate_child(self, child: ET.Element):
+        """
+        Validates scenario steps
+        :param child:
+        :return:
+        """
         action_attributes = set(child.keys())
         mandatory_attributes = set(MANDATORY_ATTRIBUTES)
         optional_attributes = set(MANDATORY_ATTRIBUTES + OPTIONAL_ATTRIBUTES)

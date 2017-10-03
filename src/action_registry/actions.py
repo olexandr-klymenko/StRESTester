@@ -16,7 +16,7 @@ from utils import async_timeit_decorator, serialize
 
 logger = getLogger('asyncio')
 
-__all__ = []
+__all__ = ['async_rest_call', 'get_value', 'async_sleep']
 
 
 @register_action_decorator(action_name='rest', mandatory_args=('url', 'method'))
