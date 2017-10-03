@@ -1,11 +1,10 @@
-import asyncio
 import json
 import multiprocessing as mp
 import timeit
 import traceback
 from logging import getLogger
 from multiprocessing import Queue
-from typing import Dict
+from typing import Dict, Coroutine
 
 from constants import REQUEST_ARGS, SERIALIZABLE_ARGS
 from counter import StatsCounter
@@ -15,7 +14,7 @@ __all__ = ['parse_scenario_template', 'async_timeit_decorator', 'timeit_decorato
 logger = getLogger('asyncio')
 
 
-def async_timeit_decorator(coro: asyncio.coroutine) -> asyncio.coroutine:
+def async_timeit_decorator(coro: Coroutine) -> Coroutine:
     async def wrapper(*args, **kwargs):
         start = timeit.default_timer()
         result = await coro(*args, **kwargs)

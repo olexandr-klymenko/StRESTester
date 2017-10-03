@@ -1,6 +1,6 @@
 from collections import namedtuple
 from logging import getLogger
-from typing import Tuple, Awaitable
+from typing import Tuple, Coroutine
 
 __all__ = ['ActionsRegistry', 'register_action_decorator']
 
@@ -15,11 +15,11 @@ class ActionsRegistry:
     _registry = {}
 
     @classmethod
-    def register_action(cls, coro: Awaitable, action_name: str, mandatory_args: Tuple):
+    def register_action(cls, coro: Coroutine, action_name: str, mandatory_args: Tuple):
         cls._registry[action_name] = cls.Action(coro=coro, args=mandatory_args)
 
     @classmethod
-    def get_action(cls, action_name) -> Action:
+    def get_action(cls, action_name: str) -> Action:
         if action_name not in cls._registry:
             raise KeyError("Action '%s' is not registered. Valid actions: %s" % (action_name, cls.get_actions()))
         return cls._registry[action_name]
