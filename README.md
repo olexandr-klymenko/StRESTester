@@ -105,11 +105,11 @@ StRESTester is a Python tool for testing RESTful APIs compilant with [Swagger 1.
     </rest>
 </scenario>
 ```
-* scenario consists of snippets, so called actions ('rest', 'get')
+* scenario consists of snippets, so called actions (_'rest'_, _'get'_)
 * list of actions can be extended
-* each action must have mandatory attribute 'name'
-* attribute 'return' intended for assignment return of action to given variable
-* node 'repeat' allows to create loops of scenario snippets, meaning of the attribute 'cycles' is obvious
+* each action must have mandatory attribute <b>_'name'_</b>
+* attribute <b>_'return'_</b> intended for assignment return of action to given variable
+* node <b>_'repeat'_</b> allows to create loops of scenario snippets, meaning of the attribute <b>_'cycles'_</b> is obvious
 
 # Report output
 * report output looks like
