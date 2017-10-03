@@ -19,7 +19,7 @@ logger = getLogger('asyncio')
 __all__ = []
 
 
-@register_action_decorator('rest')
+@register_action_decorator(action_name='rest', mandatory_args=('url', 'method'))
 async def async_rest_call(name, **kwargs) -> Union[str, bytes]:
     """
     The main action which performs HTTP REST requests to target resource
@@ -75,12 +75,12 @@ async def async_http_request(name, session: ClientSession, **kwargs) -> str:
         return resp_data
 
 
-@register_action_decorator('sleep')
+@register_action_decorator(action_name='sleep')
 async def async_sleep(sec):
     await asyncio.sleep(sec)
 
 
-@register_action_decorator('get')
+@register_action_decorator(action_name='get')
 async def get_value(info: Union[str, Dict], key: str, **kwargs):
     """
     Auxiliary action for processing responses like dictionary

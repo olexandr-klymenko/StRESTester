@@ -1,15 +1,14 @@
 from copy import deepcopy
+from pprint import pprint
 from xml.etree import ElementTree as ET
 
 from action_registry.registry import ActionsRegistry
 from constants import REPEAT, CYCLES, RETURN
 
-
 __all__ = ['Scenario']
 
-
 MANDATORY_ATTRIBUTES = ['name']
-AVAILABLE_ATTRIBUTES = [RETURN]
+OPTIONAL_ATTRIBUTES = [RETURN]
 
 
 class Scenario:
@@ -51,17 +50,26 @@ class Scenario:
     def _validate_child(self, child: ET.Element):
         action_attributes = set(child.keys())
         mandatory_attributes = set(MANDATORY_ATTRIBUTES)
-        optional_attributes = set(MANDATORY_ATTRIBUTES + AVAILABLE_ATTRIBUTES)
+        optional_attributes = set(MANDATORY_ATTRIBUTES + OPTIONAL_ATTRIBUTES)
 
-        assert child.tag in self._registered_actions, \
-            'Scenario action "%s" not in action list %s' % (child.tag, self._registered_actions)
+        try:
+            assert child.tag in self._registered_actions, \
+                'Scenario action "%s" not in action list %s' % (child.tag, self._registered_actions)
 
-        assert mandatory_attributes.issubset(action_attributes),\
-            "Mandatory attributes missing in '%s'" % str(mandatory_attributes - action_attributes)
+            assert mandatory_attributes.issubset(action_attributes), \
+                "Mandatory attributes missing in '%s'" % str(mandatory_attributes - action_attributes)
 
-        assert action_attributes.issubset(optional_attributes),\
-            "There is at least one invalid attribute: '%s'" % str(action_attributes - optional_attributes)
+            assert action_attributes.issubset(optional_attributes), \
+                "There is at least one invalid attribute: '%s'" % str(action_attributes - optional_attributes)
 
-        nodes = [node.tag for node in child]
-        assert len(nodes) == len(set(nodes)), 'There is duplicated arguments in action "%s: %s != %s"'\
-                                              % (child.tag, list(nodes), list(set(nodes)))
+            nodes = [node.tag for node in child]
+            mandatory_arguments = ActionsRegistry.get_action(child.tag).args
+            if mandatory_arguments:
+                assert set(mandatory_arguments).issubset(set(nodes)), "Mandatory arguments missing: %s" % \
+                                                                      str(set(mandatory_arguments) - set(nodes))
+
+            assert len(nodes) == len(set(nodes)), 'There is duplicated arguments in action "%s: %s != %s"' \
+                                                  % (child.tag, list(nodes), list(set(nodes)))
+        except AssertionError:
+            pprint(ET.tostring(child).decode(), indent=4)
+            raise

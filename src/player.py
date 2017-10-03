@@ -48,7 +48,7 @@ class StressTestPlayer:
             parsed_args = []
             parsed_kwargs = {'xml': ET.tostring(child)}
             action_name = child.tag
-            coro = ActionsRegistry.get_action(action_name)
+            coro = ActionsRegistry.get_action(action_name).coro
             if action_name == 'rest':
                 parsed_args.append(child.attrib['name'])
 
