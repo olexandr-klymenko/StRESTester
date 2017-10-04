@@ -1,8 +1,36 @@
 from multiprocessing import Queue, Process, Pipe
+import traceback
 
 from report import StressTestReport
-from utils import progress_handler, StressTestProcess
+from utils import progress_handler
 from worker import worker
+
+
+__all_ = ['WorkerManager']
+
+
+class StressTestProcess(Process):
+    """
+    Customized process class intended to handle exceptions within worker
+    """
+    def __init__(self, *args, **kwargs):
+        Process.__init__(self, *args, **kwargs)
+        self._pconn, self._cconn = Pipe()
+        self._exception = None
+
+    def run(self):
+        try:
+            Process.run(self)
+            self._cconn.send(None)
+        except Exception as e:
+            tb = traceback.format_exc()
+            self._cconn.send((e, tb))
+
+    @property
+    def exception(self):
+        if self._pconn.poll():
+            self._exception = self._pconn.recv()
+        return self._exception
 
 
 class WorkerManager:
@@ -54,8 +82,8 @@ class WorkerManager:
         try:
             for _, (__, process) in self._workers_info.items():
                 if process.exception:
-                    error, traceback = process.exception
-                    raise Exception(traceback)
+                    error, _traceback = process.exception
+                    raise Exception(_traceback)
 
         except Exception:
             self._progress_process.terminate()
@@ -63,5 +91,8 @@ class WorkerManager:
         else:
             self._progress_process.join()
         finally:
+            for _, (__, process) in self._workers_info.items():
+                if process.is_alive():
+                    process.terminate()
             report = StressTestReport(self._report_metrics)
             report.process_metrics()
