@@ -19,8 +19,9 @@ class Scenario:
     _validated_steps = []
 
     def __init__(self, path: str):
-        self._path = path
-        self._root = self._parse()
+        with open(path) as f:
+            _root = ET.parse(f).getroot()
+        self._root = self._parse(_root)
 
     def __call__(self, *args, **kwargs) -> ET.Element:
         return self._root
@@ -32,15 +33,16 @@ class Scenario:
         for el in self._root:
             yield el
 
-    def _parse(self) -> ET.Element:
+    def _parse(self, raw_root: ET.Element) -> ET.Element:
         """
         Unpack loops into plain xml root of scenario
+        :param raw_root:
         :return:
         """
-        with open(self._path) as f:
-            _root = ET.parse(f).getroot()
+        new_root = ET.Element('scenario')
 
-        def _parse_root(root: ET.Element, new_root=None) -> ET.Element:
+        def _parse_root(root: ET.Element=raw_root) -> ET.Element:
+            nonlocal new_root
 
             for child in root:
                 if child.tag != REPEAT:
@@ -48,16 +50,14 @@ class Scenario:
                         self._validate_child(child)
                         self._validated_steps.append(ET.tostring(child))
 
-                    if new_root is None:
-                        new_root = ET.Element('scenario')
                     new_root.append(child)
 
                 else:
                     for cycle in range(int(child.attrib[CYCLES])):
-                        _parse_root(deepcopy(child), new_root)
+                        _parse_root(deepcopy(child))
             return new_root
 
-        return _parse_root(deepcopy(_root))
+        return _parse_root()
 
     def _validate_child(self, child: ET.Element):
         """

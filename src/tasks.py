@@ -12,6 +12,7 @@ from version import version
 from workers_manager import WorkerManager
 
 # TODO add doc strings
+# TODO implement unit testing
 # TODO implement web ui
 
 logger = logging.getLogger(__name__)
