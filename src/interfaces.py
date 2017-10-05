@@ -1,7 +1,7 @@
 from abc import ABCMeta, abstractmethod
 from typing import Dict
 
-__all__ = ['BaseStressTestConfig']
+__all__ = ['BaseStressTestConfig', 'BaseActionsRegistry']
 
 
 class BaseStressTestConfig(dict, metaclass=ABCMeta):
@@ -23,4 +23,19 @@ class BaseStressTestConfig(dict, metaclass=ABCMeta):
 
     @abstractmethod
     def _validate_config(self):
+        pass
+
+
+class BaseActionsRegistry(metaclass=ABCMeta):
+
+    @abstractmethod
+    def register_action(self, *args, **kwargs):
+        pass
+
+    @abstractmethod
+    def get_action(self, *args, **kwargs):
+        pass
+
+    @abstractmethod
+    def get_actions(self, *args, **kwargs):
         pass

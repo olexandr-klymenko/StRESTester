@@ -1,13 +1,15 @@
 from collections import namedtuple
 from logging import getLogger
-from typing import Tuple, Coroutine
+from typing import Tuple, Coroutine, List
+
+from interfaces import BaseActionsRegistry
 
 __all__ = ['ActionsRegistry', 'register_action_decorator']
 
 logger = getLogger('asyncio')
 
 
-class ActionsRegistry:
+class ActionsRegistry(BaseActionsRegistry):
     """
     Registry contains all available stress test scenario actions
     """
@@ -26,7 +28,7 @@ class ActionsRegistry:
         return cls._registry[action_name]
 
     @classmethod
-    def get_actions(cls):
+    def get_actions(cls) -> List:
         return list(cls._registry)
 
 

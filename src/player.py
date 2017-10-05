@@ -6,6 +6,7 @@ from xml.etree import ElementTree as ET
 from jinja2 import Template
 
 from action_registry.registry import ActionsRegistry
+from interfaces import BaseActionsRegistry
 from constants import *
 from utils import timeit_decorator
 
@@ -17,12 +18,14 @@ class StressTestPlayer:
                  config: Dict,
                  scenario_xml_root: ET.Element,
                  test_users: List,
-                 progress_queue: Queue):
+                 progress_queue: Queue,
+                 act_registry: BaseActionsRegistry=ActionsRegistry):
 
         self._config = config
         self._scenario_xml_root = scenario_xml_root
         self._test_users = test_users
         self._progress_queue = progress_queue
+        self._action_registry = act_registry
 
     @timeit_decorator
     def run_player(self):
@@ -55,7 +58,7 @@ class StressTestPlayer:
             parsed_args = []
             parsed_kwargs = {'xml': ET.tostring(child)}
             action_name = child.tag
-            coro = ActionsRegistry.get_action(action_name).coro
+            coro = self._action_registry.get_action(action_name).coro
             if action_name == 'rest':
                 parsed_args.append(child.attrib['name'])
 
