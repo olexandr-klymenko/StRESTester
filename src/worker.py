@@ -1,6 +1,6 @@
 import os
 from multiprocessing import connection, Queue
-from typing import List
+from typing import List, Iterable
 from xml.etree import ElementTree as ET
 
 from codes_description import HTTPCodesDescription
@@ -13,16 +13,16 @@ from stress_test_config import StressTestConfig
 configure_logging()
 
 
-def worker(worker_index: int,
-           scenario_xml_root: ET.Element,
-           conn: connection,
-           progress_queue: Queue):
+def process_worker(worker_index: int,
+                   scenario: Iterable[ET.Element],
+                   conn: connection,
+                   progress_queue: Queue):
     """
     The function which is intended to run in separate process
      as a target within multiprocessing.Process
 
     :param worker_index:
-    :param scenario_xml_root:
+    :param scenario:
     :param conn:
     :param progress_queue:
     :return:
@@ -34,7 +34,7 @@ def worker(worker_index: int,
     test_users = _get_users(_config[USERS_NUMBER], worker_index)
 
     player = StressTestPlayer(config=_config,
-                              scenario_xml_root=scenario_xml_root,
+                              scenario=scenario,
                               test_users=test_users,
                               progress_queue=progress_queue)
     try:

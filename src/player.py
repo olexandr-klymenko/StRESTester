@@ -1,6 +1,6 @@
 import asyncio
 from multiprocessing import Queue
-from typing import Dict, List
+from typing import Dict, List, Iterable
 from xml.etree import ElementTree as ET
 
 from jinja2 import Template
@@ -16,13 +16,13 @@ __all__ = ['StressTestPlayer']
 class StressTestPlayer:
     def __init__(self,
                  config: Dict,
-                 scenario_xml_root: ET.Element,
+                 scenario: Iterable[ET.Element],
                  test_users: List,
                  progress_queue: Queue,
                  act_registry: BaseActionsRegistry=ActionsRegistry):
 
         self._config = config
-        self._scenario_xml_root = scenario_xml_root
+        self._scenario = scenario
         self._test_users = test_users
         self._progress_queue = progress_queue
         self._action_registry = act_registry
@@ -32,6 +32,7 @@ class StressTestPlayer:
         """
         Creates loop within given process worker, iterates over ITERATION NUMBER,
          user names and runs action coroutines
+
         :return:
         """
         loop = asyncio.get_event_loop()
@@ -54,7 +55,7 @@ class StressTestPlayer:
         :param scenario_kwargs:
         :return:
         """
-        for idx, child in enumerate(self._scenario_xml_root):
+        for idx, child in enumerate(self._scenario):
             parsed_args = []
             parsed_kwargs = {'xml': ET.tostring(child)}
             action_name = child.tag

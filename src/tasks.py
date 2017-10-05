@@ -26,20 +26,20 @@ logger.setLevel(logging.INFO)
 @task
 def run(_, scenario, config):
     logger.info("Starting '%s' version %s ..." % (PROJECT, version))
-    scenario_xml_root = Scenario(scenario)
+    scenario_obj = Scenario(scenario)
 
     cfg = StressTestConfig(config)
     os.environ[ST_CONFIG_PATH] = config
 
     total_actions =\
-        len(scenario_xml_root) *\
+        len(scenario_obj) *\
         cfg[WORKERS_NUMBER] *\
         cfg[USERS_NUMBER] *\
         cfg[ITERATIONS_NUMBER]
 
     logger.info("Total actions: %s" % total_actions)
 
-    workers_manager = WorkerManager(scenario_xml_root, cfg[WORKERS_NUMBER], total_actions)
+    workers_manager = WorkerManager(scenario_obj, cfg[WORKERS_NUMBER], total_actions)
     workers_manager.manage_workers()
 
 

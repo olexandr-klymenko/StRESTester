@@ -1,9 +1,11 @@
 from multiprocessing import Queue, Process, Pipe
 import traceback
+from xml.etree import ElementTree as ET
+from typing import Iterable
 
 from report import StressTestReport
 from utils import progress_handler
-from worker import worker
+from worker import process_worker
 
 
 __all_ = ['WorkerManager']
@@ -34,8 +36,11 @@ class StressTestProcess(Process):
 
 
 class WorkerManager:
-    def __init__(self, scenario_xml_root, workers_number, total_actions):
-        self._scenario_xml_root = scenario_xml_root
+    def __init__(self, scenario: Iterable[ET.Element],
+                 workers_number: int,
+                 total_actions: int):
+
+        self._scenario = scenario
         self._workers_number = workers_number
         self._total_actions = total_actions
         self._workers_info = {}
@@ -62,9 +67,9 @@ class WorkerManager:
         for index in range(1, self._workers_number + 1):
             parent_conn, child_conn = Pipe()
             self._workers_info[index] =\
-                parent_conn, StressTestProcess(target=worker,
+                parent_conn, StressTestProcess(target=process_worker,
                                                args=(index,
-                                                     self._scenario_xml_root,
+                                                     self._scenario,
                                                      child_conn,
                                                      self._progress_queue))
 

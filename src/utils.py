@@ -7,8 +7,7 @@ from typing import Dict, Coroutine
 from constants import REQUEST_ARGS, SERIALIZABLE_ARGS
 from counter import StatsCounter
 
-__all__ = ['parse_scenario_template', 'async_timeit_decorator', 'timeit_decorator',
-           'serialize']
+__all__ = ['async_timeit_decorator', 'timeit_decorator', 'serialize', 'progress_handler']
 
 logger = getLogger('asyncio')
 
