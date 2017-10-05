@@ -6,7 +6,8 @@ from logging import getLogger
 from typing import Dict, Union
 
 from aiohttp import ClientSession
-from aiohttp.client_exceptions import ClientConnectorError, ClientOSError, ClientResponseError
+from aiohttp.client_exceptions import ClientConnectorError, ClientOSError,\
+    ClientResponseError
 
 from action_registry.registry import register_action_decorator
 from codes_description import HTTPCodesDescription
@@ -34,7 +35,11 @@ async def async_rest_call(name, **kwargs) -> Union[str, bytes]:
         async with ClientSession() as session:
             try:
                 resp_data = await async_http_request(name, session, **kwargs)
-            except (ClientConnectorError, ClientOSError, ClientResponseError, TimeoutError) as err:
+            except (ClientConnectorError,
+                    ClientOSError,
+                    ClientResponseError,
+                    TimeoutError
+                    ) as err:
                 logger.warning(str(err))
                 StatsCounter.append_error_metric(action_name=name)
                 attempts_left -= 1
@@ -94,4 +99,5 @@ async def get_value(info: Union[str, Dict], key: str, **kwargs):
         return json.loads(info)[key]
     except TypeError:
         sys.stdout.write(kwargs['xml'].decode())
-        raise ValueError('Unexpected HTTP response or incorrect dictionary name in scenario')
+        raise ValueError('Unexpected HTTP response'
+                         ' or incorrect dictionary name in scenario')

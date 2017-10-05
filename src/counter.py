@@ -25,7 +25,8 @@ class StatsCounter:
 
     @classmethod
     def get_averages(cls):
-        return {action_name: sum(values) / len(values) for action_name, values in cls._time_counter.items()}
+        return {action_name: sum(values) / len(values)
+                for action_name, values in cls._time_counter.items()}
 
     @classmethod
     def get_errors(cls):

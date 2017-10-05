@@ -21,7 +21,8 @@ class ActionsRegistry:
     @classmethod
     def get_action(cls, action_name: str) -> Action:
         if action_name not in cls._registry:
-            raise KeyError("Action '%s' is not registered. Valid actions: %s" % (action_name, cls.get_actions()))
+            raise KeyError("Action '%s' is not registered. Valid actions: %s"
+                           % (action_name, cls.get_actions()))
         return cls._registry[action_name]
 
     @classmethod
@@ -31,13 +32,17 @@ class ActionsRegistry:
 
 def register_action_decorator(action_name: str, mandatory_args=None):
     """
-    Decorator with argument "action_name" which registers functions as an stress test scenario action.
+    Decorator with argument "action_name" which registers functions
+     as an stress test scenario action.
+
     :param action_name:
     :param mandatory_args:
     :return:
     """
     def helper(coro):
-        ActionsRegistry.register_action(coro=coro, action_name=action_name, mandatory_args=mandatory_args)
+        ActionsRegistry.register_action(coro=coro,
+                                        action_name=action_name,
+                                        mandatory_args=mandatory_args)
         
         async def wrapper(*args, **kwargs):
             result = await coro(*args, **kwargs)

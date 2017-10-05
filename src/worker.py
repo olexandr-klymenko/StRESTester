@@ -13,10 +13,14 @@ from stress_test_config import StressTestConfig
 configure_logging()
 
 
-def worker(worker_index: int, scenario_xml_root: ET.Element, conn: connection, progress_queue: Queue):
+def worker(worker_index: int,
+           scenario_xml_root: ET.Element,
+           conn: connection,
+           progress_queue: Queue):
     """
     The function which is intended to run in separate process
      as a target within multiprocessing.Process
+
     :param worker_index:
     :param scenario_xml_root:
     :param conn:
@@ -43,9 +47,11 @@ def worker(worker_index: int, scenario_xml_root: ET.Element, conn: connection, p
 def _get_users(users_number, worker_index) -> List:
     """
     It figures out the list of users for given worker
+
     :param users_number:
     :param worker_index:
     :return: list of user names
     """
     return ["%s_%s" % (TEST_USER_NAME, idx)
-            for idx in range((worker_index - 1) * users_number, users_number * worker_index)]
+            for idx in range((worker_index - 1) * users_number,
+                             users_number * worker_index)]

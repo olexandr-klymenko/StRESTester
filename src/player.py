@@ -13,7 +13,12 @@ __all__ = ['StressTestPlayer']
 
 
 class StressTestPlayer:
-    def __init__(self, config: Dict, scenario_xml_root: ET.Element, test_users: List, progress_queue: Queue):
+    def __init__(self,
+                 config: Dict,
+                 scenario_xml_root: ET.Element,
+                 test_users: List,
+                 progress_queue: Queue):
+
         self._config = config
         self._scenario_xml_root = scenario_xml_root
         self._test_users = test_users
@@ -39,8 +44,10 @@ class StressTestPlayer:
 
     async def _parse_scenario_template(self, scenario_kwargs: Dict):
         """
-        Parser which converts parsed scenario actions into asyncio coroutines and awaits them.
+        Parser which converts parsed scenario actions into asyncio coroutines
+         and awaits them.
         After awaiting coro puts message (0) to progress queue
+
         :param scenario_kwargs:
         :return:
         """
@@ -56,14 +63,17 @@ class StressTestPlayer:
 
             for node in child:
                 try:
-                    parsed_kwargs[node.tag] = Template(node.text).render(**scenario_kwargs)
+                    parsed_kwargs[node.tag] =\
+                        Template(node.text).render(**scenario_kwargs)
+
                 except (NameError, SyntaxError):
                     parsed_kwargs[node.tag] = node.text
 
             parsed_kwargs['username'] = scenario_kwargs['username']
 
             if return_variable:
-                scenario_kwargs[return_variable] = await coro(*parsed_args, **parsed_kwargs)
+                scenario_kwargs[return_variable] = await coro(*parsed_args,
+                                                              **parsed_kwargs)
             else:
                 await coro(*parsed_args, **parsed_kwargs)
             self._progress_queue.put(0)

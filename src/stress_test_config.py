@@ -22,7 +22,8 @@ class StressTestConfig(BaseStressTestConfig):
             return json.load(config_file)
 
     def _validate_config(self):
-        assert set(MANDATORY_CONFIG_FIELDS).issubset(set(self._config)), "Config file is not complete"
+        assert set(MANDATORY_CONFIG_FIELDS).issubset(set(self._config)),\
+            "Config file is not complete"
 
         for url_name, url in self._config[URLS].items():
             assert validators.url(url), "Invalid url: %s %s" % (url_name, url)

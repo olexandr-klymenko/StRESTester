@@ -20,7 +20,8 @@ class StressTestReport:
             err_sums.update(error_metrics)
 
         print("Action metrics (averages):")
-        pprint({metric: float(am_sums[metric])/am_counters[metric] for metric in am_sums.keys()}, indent=4)
+        pprint({metric: float(am_sums[metric])/am_counters[metric]
+                for metric in am_sums.keys()}, indent=4)
         print("Error metrics:")
         pprint(dict(err_sums), indent=4)
 

@@ -58,7 +58,8 @@ class HTTPCodesDescription:
                     except KeyError:
                         logger.warning("Probably unexpected status code %s" % status)
                         return UNKNOWN
-            raise Exception("Path '%s' is not part of any blueprint %s of the url '%s'" % (path, cls._info[url], url))
+            raise Exception("Path '%s' is not part of any blueprint %s of the url '%s'" %
+                            (path, cls._info[url], url))
         return responses[status]
 
 

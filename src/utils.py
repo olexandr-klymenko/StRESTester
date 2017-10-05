@@ -7,7 +7,8 @@ from typing import Dict, Coroutine
 from constants import REQUEST_ARGS, SERIALIZABLE_ARGS
 from counter import StatsCounter
 
-__all__ = ['parse_scenario_template', 'async_timeit_decorator', 'timeit_decorator', 'serialize']
+__all__ = ['parse_scenario_template', 'async_timeit_decorator', 'timeit_decorator',
+           'serialize']
 
 logger = getLogger('asyncio')
 
@@ -44,7 +45,8 @@ def serialize(kwarg_info: Dict) -> Dict:
     :return:
     """
     _kwargs = {key: value for key, value in kwarg_info.items() if key in REQUEST_ARGS}
-    serializable = {key: json.loads(value) for key, value in _kwargs.items() if key in SERIALIZABLE_ARGS}
+    serializable = {key: json.loads(value)
+                    for key, value in _kwargs.items() if key in SERIALIZABLE_ARGS}
     _kwargs.update(serializable)
     return _kwargs
 

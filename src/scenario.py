@@ -71,22 +71,28 @@ class Scenario:
 
         try:
             assert child.tag in self._registered_actions, \
-                'Scenario action "%s" not in action list %s' % (child.tag, self._registered_actions)
+                'Scenario action "%s" not in action list %s' %\
+                (child.tag, self._registered_actions)
 
             assert mandatory_attributes.issubset(action_attributes), \
-                "Mandatory attributes missing in '%s'" % str(mandatory_attributes - action_attributes)
+                "Mandatory attributes missing in '%s'" %\
+                str(mandatory_attributes - action_attributes)
 
             assert action_attributes.issubset(optional_attributes), \
-                "There is at least one invalid attribute: '%s'" % str(action_attributes - optional_attributes)
+                "There is at least one invalid attribute: '%s'" %\
+                str(action_attributes - optional_attributes)
 
             nodes = [node.tag for node in child]
             mandatory_arguments = ActionsRegistry.get_action(child.tag).args
             if mandatory_arguments:
-                assert set(mandatory_arguments).issubset(set(nodes)), "Mandatory arguments missing: %s" % \
-                                                                      str(set(mandatory_arguments) - set(nodes))
 
-            assert len(nodes) == len(set(nodes)), 'There is duplicated arguments in action "%s: %s != %s"' \
-                                                  % (child.tag, list(nodes), list(set(nodes)))
+                assert set(mandatory_arguments).issubset(set(nodes)),\
+                    "Mandatory arguments missing: %s" % \
+                    str(set(mandatory_arguments) - set(nodes))
+
+            assert len(nodes) == len(set(nodes)),\
+                'There is duplicated arguments in action "%s: %s != %s"' %\
+                (child.tag, list(nodes), list(set(nodes)))
 
         except AssertionError:
             pprint(ET.tostring(child).decode(), indent=4)

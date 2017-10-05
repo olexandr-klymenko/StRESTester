@@ -53,18 +53,20 @@ class WorkerManager:
 
     def _init_progress_queue(self):
         self._progress_queue = Queue()
-        self._progress_process = Process(target=progress_handler, args=(self._progress_queue,
-                                                                        self._total_actions))
+        self._progress_process = Process(target=progress_handler,
+                                         args=(self._progress_queue,
+                                               self._total_actions))
         self._progress_process.start()
 
     def _init_workers(self):
         for index in range(1, self._workers_number + 1):
             parent_conn, child_conn = Pipe()
-            self._workers_info[index] = parent_conn, StressTestProcess(target=worker,
-                                                                       args=(index,
-                                                                             self._scenario_xml_root,
-                                                                             child_conn,
-                                                                             self._progress_queue))
+            self._workers_info[index] =\
+                parent_conn, StressTestProcess(target=worker,
+                                               args=(index,
+                                                     self._scenario_xml_root,
+                                                     child_conn,
+                                                     self._progress_queue))
 
     def _start_workers(self):
         for _, (__, process) in self._workers_info.items():
