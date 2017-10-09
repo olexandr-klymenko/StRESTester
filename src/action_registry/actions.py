@@ -4,6 +4,7 @@ import sys
 from concurrent.futures._base import TimeoutError
 from logging import getLogger
 from typing import Dict, Union
+import traceback
 
 from aiohttp import ClientSession
 from aiohttp.client_exceptions import ClientConnectorError, ClientOSError,\
@@ -11,7 +12,8 @@ from aiohttp.client_exceptions import ClientConnectorError, ClientOSError,\
 
 from action_registry.registry import register_action_decorator
 from codes_description import HTTPCodesDescription
-from constants import MAX_RETRY, RETRY_DELAY, REST_REQUEST_TIMEOUT
+from constants import MAX_RETRY, RETRY_DELAY, REST_REQUEST_TIMEOUT,\
+    IGNORE_ERRORS
 from counter import StatsCounter
 from utils import async_timeit_decorator, serialize
 
@@ -41,12 +43,16 @@ async def async_rest_call(name, **kwargs) -> Union[str, bytes]:
                     TimeoutError
                     ) as err:
                 logger.warning(str(err))
+                traceback.print_exc(file=sys.stdout)
+                if kwargs[IGNORE_ERRORS]:
+                    return
                 StatsCounter.append_error_metric(action_name=name)
                 attempts_left -= 1
                 await asyncio.sleep(RETRY_DELAY)
                 continue
             else:
                 return resp_data
+
     raise Exception("Max number of retries exceeded")
 
 

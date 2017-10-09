@@ -11,6 +11,7 @@ TEST_USER_NAME = 'st_user'
 TEST_USER_PASSWORD = '123'
 
 RETURN = 'return'
+IGNORE_ERRORS = 'ignore_errors'
 REPEAT = 'repeat'
 CYCLES = 'cycles'
 
