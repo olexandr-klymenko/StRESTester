@@ -81,7 +81,7 @@ StRESTester is a Python tool for testing RESTful APIs compilant with [Swagger 1.
         <key>user_id</key>
     </get>
     <repeat cycles="5">
-        <rest name="Set user wallet to 10">
+        <rest name="Set user wallet to 10" ignore_errors="True">
             <method>PUT</method>
             <url>{{ api }}/super/bank/{{ user_id }}</url>
             <data>{"amount": 10}</data>
@@ -116,6 +116,7 @@ StRESTester is a Python tool for testing RESTful APIs compilant with [Swagger 1.
 * list of actions can be extended
 * each action must have mandatory attribute <b>_'name'_</b>
 * attribute <b>_'return'_</b> intended for assignment return of action to given variable
+* attribute <b>_'ignore_errors'_</b> allows to ignore failed actions
 * node <b>_'repeat'_</b> allows to create loops of scenario snippets, meaning of the attribute <b>_'cycles'_</b> is obvious
 * jinja2 template is used to define action arguments
 

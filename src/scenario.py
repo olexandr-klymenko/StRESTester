@@ -4,12 +4,12 @@ from xml.etree import ElementTree as ET
 from typing import List, Callable
 
 from action_registry.registry import ActionsRegistry
-from constants import REPEAT, CYCLES, RETURN
+from constants import REPEAT, CYCLES, RETURN, IGNORE_ERRORS
 
 __all__ = ['Scenario']
 
 MANDATORY_ATTRIBUTES = ['name']
-OPTIONAL_ATTRIBUTES = [RETURN]
+OPTIONAL_ATTRIBUTES = [RETURN, IGNORE_ERRORS]
 
 
 def validate_child(child: ET.Element, registered_actions: List):

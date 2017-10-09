@@ -62,6 +62,8 @@ class StressTestPlayer:
             coro = self._action_registry.get_action(action_name).coro
             if action_name == 'rest':
                 parsed_args.append(child.attrib['name'])
+                parsed_kwargs.update(
+                    {IGNORE_ERRORS: child.attrib.get(IGNORE_ERRORS, False)})
 
             return_variable = child.attrib.get(RETURN)
 
