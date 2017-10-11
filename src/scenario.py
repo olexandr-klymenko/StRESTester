@@ -25,29 +25,30 @@ def validate_child(child: ET.Element, registered_actions: List):
     optional_attributes = set(MANDATORY_ATTRIBUTES + OPTIONAL_ATTRIBUTES)
 
     try:
-        assert child.tag in registered_actions, \
-            'Scenario action "%s" not in action list %s' %\
-            (child.tag, registered_actions)
+        if child.tag not in registered_actions:
+            raise Exception('Scenario action "%s" not in action list %s' %
+                            (child.tag, registered_actions))
 
-        assert mandatory_attributes.issubset(action_attributes), \
-            "Mandatory attributes missing in '%s'" %\
-            str(mandatory_attributes - action_attributes)
+        if not mandatory_attributes.issubset(action_attributes):
+            raise Exception("Mandatory attributes missing in '%s'" %
+                            str(mandatory_attributes - action_attributes))
 
-        assert action_attributes.issubset(optional_attributes), \
-            "There is at least one invalid attribute: '%s'" %\
-            str(action_attributes - optional_attributes)
+        if not action_attributes.issubset(optional_attributes):
+            raise Exception("There is at least one invalid attribute: '%s'" %
+                            str(action_attributes - optional_attributes))
 
         nodes = [node.tag for node in child]
         mandatory_arguments = ActionsRegistry.get_action(child.tag).args
         if mandatory_arguments:
 
-            assert set(mandatory_arguments).issubset(set(nodes)),\
-                "Mandatory arguments missing: %s" % \
-                str(set(mandatory_arguments) - set(nodes))
+            if not set(mandatory_arguments).issubset(set(nodes)):
+                raise Exception("Mandatory arguments missing: %s" %
+                                str(set(mandatory_arguments) - set(nodes)))
 
-        assert len(nodes) == len(set(nodes)),\
-            'There is duplicated arguments in action "%s: %s != %s"' %\
-            (child.tag, list(nodes), list(set(nodes)))
+        if len(nodes) != len(set(nodes)):
+            raise Exception('There is duplicated arguments in action'
+                            ' "%s: %s != %s"' %
+                            (child.tag, list(nodes), list(set(nodes))))
 
     except AssertionError:
         pprint(ET.tostring(child).decode(), indent=4)
