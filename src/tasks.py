@@ -39,7 +39,9 @@ def run(_, scenario, config):
 
     logger.info("Total actions: %s" % total_actions)
 
-    workers_manager = WorkerManager(scenario_obj, cfg[WORKERS_NUMBER], total_actions)
+    workers_manager = WorkerManager(scenario_obj,
+                                    cfg[WORKERS_NUMBER],
+                                    total_actions)
     workers_manager.manage_workers()
 
 

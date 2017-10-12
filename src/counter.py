@@ -8,7 +8,8 @@ __all__ = ['StatsCounter']
 
 class StatsCounter:
     """
-    Class for dealing with stress test scenario actions' metrics within separate process.
+    Class for dealing with stress test scenario actions' metrics
+     within separate process.
     It collects them and finally returns to for StressTestReport to process
     """
     _time_counter = {}

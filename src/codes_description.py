@@ -38,9 +38,12 @@ class HTTPCodesDescription:
     async def _do_init(cls, config):
         for swagger_root, swagger_paths in config[BLUEPRINTS_INFO].items():
             for _path in swagger_paths:
-                url = urljoin(urljoin(config[swagger_root], _path), SWAGGER_JSON)
+                url = urljoin(urljoin(config[swagger_root],
+                                      _path),
+                              SWAGGER_JSON)
                 logger.info("Adding swagger from '%s'" % url)
-                cls._info[config[swagger_root]][_path] = await _async_get_swagger(url)
+                cls._info[config[swagger_root]][_path] =\
+                    await _async_get_swagger(url)
 
     # TODO figure out swagger path from swagger_info
     # TODO Use 3rd party swagger parser
@@ -54,13 +57,22 @@ class HTTPCodesDescription:
             for blueprint, swagger in cls._info[url].items():
                 if path.startswith(blueprint):
                     try:
-                        return swagger[PATHS][swagger_path][method.lower()]['responses'][str(status)]['description']
+                        method_info = swagger[
+                            PATHS
+                        ][swagger_path][method.lower()]
+                        return cls._get_description(method_info, status)
                     except KeyError:
-                        logger.warning("Probably unexpected status code %s" % status)
+                        logger.warning("Probably unexpected status code %s"
+                                       % status)
                         return UNKNOWN
-            raise Exception("Path '%s' is not part of any blueprint %s of the url '%s'" %
+            raise Exception("Path '%s' is not part of any blueprint %s"
+                            " of the url '%s'" %
                             (path, cls._info[url], url))
         return responses[status]
+
+    @staticmethod
+    def _get_description(method_info, status):
+        return method_info['responses'][str(status)]['description']
 
 
 async def _async_get_swagger(url) -> Dict:

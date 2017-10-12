@@ -4,7 +4,10 @@ URLS = 'urls'
 USERS_NUMBER = 'users_number'
 ITERATIONS_NUMBER = 'iterations_number'
 WORKERS_NUMBER = 'workers_number'
-MANDATORY_CONFIG_FIELDS = (URLS, USERS_NUMBER, ITERATIONS_NUMBER, WORKERS_NUMBER)
+MANDATORY_CONFIG_FIELDS = (URLS,
+                           USERS_NUMBER,
+                           ITERATIONS_NUMBER,
+                           WORKERS_NUMBER)
 
 BLUEPRINTS_INFO = 'blueprints_info'
 TEST_USER_NAME = 'st_user'

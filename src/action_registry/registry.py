@@ -17,7 +17,9 @@ class ActionsRegistry(BaseActionsRegistry):
     _registry = {}
 
     @classmethod
-    def register_action(cls, coro: Coroutine, action_name: str, mandatory_args: Tuple):
+    def register_action(cls, coro: Coroutine,
+                        action_name: str,
+                        mandatory_args: Tuple):
         cls._registry[action_name] = cls.Action(coro=coro, args=mandatory_args)
 
     @classmethod

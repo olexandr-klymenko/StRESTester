@@ -41,7 +41,8 @@ def process_worker(worker_index: int,
         player.run_player()
 
     finally:
-        conn.send((StatsCounter.get_averages(), dict(StatsCounter.get_errors())))
+        conn.send((StatsCounter.get_averages(),
+                   dict(StatsCounter.get_errors())))
 
 
 def _get_users(users_number, worker_index) -> List:

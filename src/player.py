@@ -44,7 +44,8 @@ class StressTestPlayer:
                 }
                 scenario_kwargs.update(self._config[URLS])
                 scenario_kwargs.update(self._config)
-                loop.run_until_complete(self._parse_scenario_template(scenario_kwargs))
+                loop.run_until_complete(
+                    self._parse_scenario_template(scenario_kwargs))
 
     async def _parse_scenario_template(self, scenario_kwargs: Dict):
         """

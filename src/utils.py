@@ -7,7 +7,8 @@ from typing import Dict, Coroutine
 from constants import REQUEST_ARGS, SERIALIZABLE_ARGS
 from counter import StatsCounter
 
-__all__ = ['async_timeit_decorator', 'timeit_decorator', 'serialize', 'progress_handler']
+__all__ = ['async_timeit_decorator', 'timeit_decorator', 'serialize',
+           'progress_handler']
 
 logger = getLogger('asyncio')
 
@@ -18,7 +19,8 @@ def async_timeit_decorator(coro: Coroutine) -> Coroutine:
         result = await coro(*args, **kwargs)
         action_name = args[0]
         time_metric = timeit.default_timer() - start
-        logger.debug("Action '%s' execution time: %s" % (action_name, time_metric))
+        logger.debug("Action '%s' execution time: %s"
+                     % (action_name, time_metric))
         StatsCounter.append_time_metric((action_name, time_metric))
         return result
 
@@ -31,7 +33,8 @@ def timeit_decorator(func):
         result = func(*args, **kwargs)
         func_name = kwargs.get('name', func.__name__)
         time_metric = timeit.default_timer() - start
-        logger.debug("Function '%s' execution time: %s" % (func_name, time_metric))
+        logger.debug("Function '%s' execution time: %s"
+                     % (func_name, time_metric))
         return result
 
     return wrapper
@@ -43,16 +46,17 @@ def serialize(kwarg_info: Dict) -> Dict:
     :param kwarg_info:
     :return:
     """
-    _kwargs = {key: value for key, value in kwarg_info.items() if key in REQUEST_ARGS}
-    serializable = {key: json.loads(value)
-                    for key, value in _kwargs.items() if key in SERIALIZABLE_ARGS}
+    _kwargs = {k: v for k, v in kwarg_info.items() if k in REQUEST_ARGS}
+    serializable = {k: json.loads(v)
+                    for k, v in _kwargs.items() if k in SERIALIZABLE_ARGS}
     _kwargs.update(serializable)
     return _kwargs
 
 
 def progress_handler(queue: Queue, total_actions: int):
     """
-    Gets message from progress queue and outputs progress percentage in the loop
+    Gets message from progress queue
+     and outputs progress percentage in the loop
     :param queue:
     :param total_actions:
     :return:
@@ -61,5 +65,6 @@ def progress_handler(queue: Queue, total_actions: int):
     while actions_left:
         queue.get()
         actions_left -= 1
-        percentage = ' %2.2f%% ' % ((total_actions - actions_left) * 100 / total_actions)
+        percentage = ' %2.2f%% ' %\
+                     ((total_actions - actions_left) * 100 / total_actions)
         print('{:-^80}'.format(percentage))
