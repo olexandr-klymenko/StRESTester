@@ -44,9 +44,10 @@ async def async_rest_call(name, **kwargs) -> Union[str, bytes]:
                     ) as err:
                 logger.warning(str(err))
                 traceback.print_exc(file=sys.stdout)
+                StatsCounter.append_error_metric(action_name=name)
                 if kwargs[IGNORE_ERRORS]:
                     return
-                StatsCounter.append_error_metric(action_name=name)
+
                 attempts_left -= 1
                 await asyncio.sleep(RETRY_DELAY)
                 continue
