@@ -27,7 +27,6 @@ class StressTestPlayer:
         self._progress_queue = progress_queue
         self._action_registry = act_registry
 
-    @timeit_decorator
     def run_player(self):
         """
         Creates loop within given process worker, iterates over ITERATION NUMBER,
