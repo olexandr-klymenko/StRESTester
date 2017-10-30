@@ -22,6 +22,7 @@ logger = getLogger('asyncio')
 __all__ = ['async_rest_call', 'get_value', 'async_sleep']
 
 
+# TODO implement request/sec rate measuring
 @register_action_decorator(action_name='rest', mandatory_args=('url', 'method'))
 async def async_rest_call(name, **kwargs) -> Union[str, bytes]:
     """
@@ -107,7 +108,7 @@ async def get_value(info: Union[str, Dict], key: str, **kwargs):
     info = str(info).replace("'", "\"")
     try:
         return json.loads(info)[key]
-    except TypeError:
+    except (TypeError, json.decoder.JSONDecodeError):
         sys.stdout.write(kwargs['xml'].decode())
         raise ValueError('Unexpected HTTP response'
                          ' or incorrect dictionary name in scenario')
