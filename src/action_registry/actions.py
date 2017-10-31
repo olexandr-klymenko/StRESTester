@@ -73,7 +73,8 @@ async def async_http_request(name, session: ClientSession, **kwargs) -> str:
         description = HTTPCodesDescription.get_description(resp.status,
                                                            **kwargs)
         logger.debug("'%s' '%s' %s %s, status: %s, description: %s"
-                     "\n\tpayload: %s\n\tparams: %s\n\tresponse data: %s" %
+                     "\n\tpayload: %s\n\trequest headers: %s\n\tparams: %s"
+                     "\n\tresponse data: %s\n\tresponse headers: %s" %
                      (kwargs['username'],
                       name,
                       kwargs['url'],
@@ -81,8 +82,10 @@ async def async_http_request(name, session: ClientSession, **kwargs) -> str:
                       resp.status,
                       description,
                       kwargs.get('data'),
+                      kwargs.get('headers'),
                       kwargs.get('params'),
-                      resp_data))
+                      resp_data,
+                      dict(resp.headers)))
         #  TODO: replace dirty hack
         if resp.status not in list(range(200, 209)):
             raise ClientResponseError(request_info=kwargs,
