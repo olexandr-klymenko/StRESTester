@@ -4,8 +4,6 @@ from collections import defaultdict
 __all__ = ['StatsCounter']
 
 
-# TODO implement report generation
-
 class StatsCounter:
     """
     Class for dealing with stress test scenario actions' metrics

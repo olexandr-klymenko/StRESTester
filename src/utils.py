@@ -4,11 +4,11 @@ from logging import getLogger
 from multiprocessing import Queue
 from typing import Dict, Coroutine
 
-from constants import REQUEST_ARGS, SERIALIZABLE_ARGS
+from constants import REQUEST_ARGS, SERIALIZABLE_ARGS, NAME
 from counter import StatsCounter
 
 __all__ = ['async_timeit_decorator', 'timeit_decorator', 'serialize',
-           'progress_handler']
+           'progress_handler', 'skipped_actions']
 
 logger = getLogger('asyncio')
 
@@ -31,7 +31,7 @@ def timeit_decorator(func):
     def wrapper(*args, **kwargs):
         start = timeit.default_timer()
         result = func(*args, **kwargs)
-        func_name = kwargs.get('name', func.__name__)
+        func_name = kwargs.get(NAME, func.__name__)
         time_metric = timeit.default_timer() - start
         logger.debug("Function '%s' execution time: %s"
                      % (func_name, time_metric))
@@ -68,3 +68,6 @@ def progress_handler(queue: Queue, total_actions: int):
         percentage = ' %2.2f%% ' %\
                      ((total_actions - actions_left) * 100 / total_actions)
         print('{:-^80}'.format(percentage))
+
+
+skipped_actions = set()

@@ -22,8 +22,8 @@ logger = getLogger('asyncio')
 __all__ = ['async_rest_call', 'get_value', 'async_sleep']
 
 
-# TODO implement request/sec rate measuring
-@register_action_decorator(action_name='rest', mandatory_args=('url', 'method'))
+@register_action_decorator(action_name='rest',
+                           mandatory_args=('url', 'method'))
 async def async_rest_call(name, **kwargs) -> Union[str, bytes]:
     """
     The main action which performs HTTP REST requests to target resource
@@ -68,7 +68,9 @@ async def async_http_request(name, session: ClientSession, **kwargs) -> str:
     :return:
     """
     _kwargs = serialize(kwargs)
-    async with session.request(timeout=REST_REQUEST_TIMEOUT, **_kwargs) as resp:
+    async with session.request(
+            timeout=REST_REQUEST_TIMEOUT,
+            **_kwargs) as resp:
         resp_data = await resp.text()
         description = HTTPCodesDescription.get_description(resp.status,
                                                            **kwargs)

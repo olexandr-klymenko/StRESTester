@@ -1,5 +1,6 @@
 PROJECT = 'StRESTester'
 
+NAME = 'name'
 URLS = 'urls'
 USERS_NUMBER = 'users_number'
 ITERATIONS_NUMBER = 'iterations_number'
@@ -17,6 +18,7 @@ RETURN = 'return'
 IGNORE_ERRORS = 'ignore_errors'
 REPEAT = 'repeat'
 CYCLES = 'cycles'
+SKIP_METRIC = 'skip_metric'
 
 MAX_RETRY = 10
 RETRY_DELAY = 1  # seconds

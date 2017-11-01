@@ -4,12 +4,13 @@ from xml.etree import ElementTree as ET
 from typing import List, Callable
 
 from action_registry.registry import ActionsRegistry
-from constants import REPEAT, CYCLES, RETURN, IGNORE_ERRORS
+from constants import NAME, REPEAT, CYCLES, RETURN, IGNORE_ERRORS, SKIP_METRIC
+from utils import skipped_actions
 
 __all__ = ['Scenario']
 
-MANDATORY_ATTRIBUTES = ['name']
-OPTIONAL_ATTRIBUTES = [RETURN, IGNORE_ERRORS]
+MANDATORY_ATTRIBUTES = [NAME]
+OPTIONAL_ATTRIBUTES = [RETURN, IGNORE_ERRORS, SKIP_METRIC]
 
 
 def validate_child(child: ET.Element, registered_actions: List):
@@ -62,7 +63,9 @@ class Scenario:
     _registered_actions = ActionsRegistry.get_actions()
     _validated_steps = []
 
-    def __init__(self, path: str, validator: Callable=validate_child):
+    def __init__(self, path: str,
+                 validator: Callable = validate_child
+                 ):
         with open(path) as f:
             _root = ET.parse(f).getroot()
         self._validator = validator
@@ -91,6 +94,8 @@ class Scenario:
 
             for child in root:
                 if child.tag != REPEAT:
+                    if bool(child.attrib.get(SKIP_METRIC)):
+                        skipped_actions.add(child.attrib[NAME])
                     if ET.tostring(child) not in self._validated_steps:
                         self._validator(child, self._registered_actions)
                         self._validated_steps.append(ET.tostring(child))
@@ -103,5 +108,3 @@ class Scenario:
             return new_root
 
         return _parse_root()
-
-
