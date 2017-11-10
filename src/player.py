@@ -8,7 +8,6 @@ from jinja2 import Template
 from action_registry.registry import ActionsRegistry
 from interfaces import BaseActionsRegistry
 from constants import *
-from utils import timeit_decorator
 
 __all__ = ['StressTestPlayer']
 
@@ -27,7 +26,6 @@ class StressTestPlayer:
         self._progress_queue = progress_queue
         self._action_registry = act_registry
 
-    @timeit_decorator
     def run_player(self):
         """
         Creates loop within given process worker, iterates over ITERATION NUMBER,

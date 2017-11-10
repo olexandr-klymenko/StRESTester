@@ -4,7 +4,7 @@ from xml.etree import ElementTree as ET
 from typing import List, Callable
 
 from action_registry.registry import ActionsRegistry
-from constants import NAME, REPEAT, CYCLES, RETURN, IGNORE_ERRORS, SKIP_METRIC
+from constants import *
 from utils import skipped_actions
 
 __all__ = ['Scenario']
@@ -62,6 +62,7 @@ class Scenario:
     """
     _registered_actions = ActionsRegistry.get_actions()
     _validated_steps = []
+    rest_actions_number = 0
 
     def __init__(self, path: str,
                  validator: Callable = validate_child
@@ -101,6 +102,8 @@ class Scenario:
                         self._validated_steps.append(ET.tostring(child))
 
                     new_root.append(child)
+                    if child.tag == REST:
+                        self.rest_actions_number += 1
 
                 else:
                     for cycle in range(int(child.attrib[CYCLES])):

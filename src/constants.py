@@ -14,6 +14,7 @@ BLUEPRINTS_INFO = 'blueprints_info'
 TEST_USER_NAME = 'st_user'
 TEST_USER_PASSWORD = '123'
 
+REST = 'rest'
 RETURN = 'return'
 IGNORE_ERRORS = 'ignore_errors'
 REPEAT = 'repeat'

@@ -31,7 +31,4 @@ class StressTestReport:
         print("Error metrics:")
         pprint(dict(err_sums), indent=4)
 
-        print("Request rate: %f requests/sec" %
-              (sum(am_counters.values()) / sum(am_sums.values())))
-
 # TODO implement JMEter like report

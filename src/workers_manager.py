@@ -1,20 +1,24 @@
-from multiprocessing import Queue, Process, Pipe
 import traceback
-from xml.etree import ElementTree as ET
+from logging import getLogger
+from multiprocessing import Queue, Process, Pipe
 from typing import Iterable
+from xml.etree import ElementTree as ET
 
 from report import StressTestReport
 from utils import progress_handler
+from utils import timeit_decorator
 from worker import process_worker
 
-
 __all_ = ['WorkerManager']
+
+logger = getLogger('asyncio')
 
 
 class StressTestProcess(Process):
     """
     Customized process class intended to handle exceptions within worker
     """
+
     def __init__(self, *args, **kwargs):
         Process.__init__(self, *args, **kwargs)
         self._pconn, self._cconn = Pipe()
@@ -48,7 +52,9 @@ class WorkerManager:
         self._progress_queue = None
         self._progress_process = None
 
-    def manage_workers(self):
+    @timeit_decorator
+    def run_stress_test(self, rest_actions):
+        logger.info("Total REST actions: %s" % rest_actions)
         self._init_progress_queue()
         self._init_workers()
         self._start_workers()
@@ -66,7 +72,7 @@ class WorkerManager:
     def _init_workers(self):
         for index in range(1, self._workers_number + 1):
             parent_conn, child_conn = Pipe()
-            self._workers_info[index] =\
+            self._workers_info[index] = \
                 parent_conn, StressTestProcess(target=process_worker,
                                                args=(index,
                                                      self._scenario,

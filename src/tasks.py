@@ -30,20 +30,21 @@ def run(_, scenario, config):
     cfg = StressTestConfig(config)
     os.environ[ST_CONFIG_PATH] = config
 
-    total_actions =\
-        len(scenario_obj) *\
+    scenario_iterations = \
         cfg[WORKERS_NUMBER] *\
         cfg[USERS_NUMBER] *\
         cfg[ITERATIONS_NUMBER]
 
-    logger.info("Total actions: %s" % total_actions)
+    rest_actions = scenario_obj.rest_actions_number * scenario_iterations
+
+    total_actions = len(scenario_obj) * scenario_iterations
 
     workers_manager = WorkerManager(scenario_obj,
                                     cfg[WORKERS_NUMBER],
                                     total_actions)
-    workers_manager.manage_workers()
+    workers_manager.run_stress_test(rest_actions=rest_actions)
 
 
 @task
-def getactions(_, ):
+def get_actions(_, ):
     print(ActionsRegistry.get_actions())
