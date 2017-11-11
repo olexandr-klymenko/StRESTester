@@ -35,7 +35,8 @@ def run(_, scenario, config):
         cfg[USERS_NUMBER] *\
         cfg[ITERATIONS_NUMBER]
 
-    rest_actions = scenario_obj.rest_actions_number * scenario_iterations
+    rest_actions =\
+        sum(scenario_obj.rest_actions_info.values()) * scenario_iterations
 
     total_actions = len(scenario_obj) * scenario_iterations
 
@@ -48,3 +49,6 @@ def run(_, scenario, config):
 @task
 def get_actions(_, ):
     print(ActionsRegistry.get_actions())
+
+
+# TODO implement test resp api

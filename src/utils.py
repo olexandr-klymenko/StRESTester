@@ -33,9 +33,11 @@ def timeit_decorator(func):
         result = func(*args, **kwargs)
         func_name = kwargs.get(NAME, func.__name__)
         time_metric = timeit.default_timer() - start
+        print()
         print("Function '%s' execution time: %s" % (func_name, time_metric))
+        print("Total REST actions: %s" % kwargs.get('rest_actions'))
         print("HTTP request rate: %2.2f requests/sec" %
-              (kwargs.get('rest_actions', 0) / time_metric))
+              (kwargs.get('rest_actions') / time_metric))
         return result
 
     return wrapper

@@ -2,6 +2,7 @@ from copy import deepcopy
 from pprint import pprint
 from xml.etree import ElementTree as ET
 from typing import List, Callable
+from collections import defaultdict
 
 from action_registry.registry import ActionsRegistry
 from constants import *
@@ -62,7 +63,7 @@ class Scenario:
     """
     _registered_actions = ActionsRegistry.get_actions()
     _validated_steps = []
-    rest_actions_number = 0
+    rest_actions_info = defaultdict(int)
 
     def __init__(self, path: str,
                  validator: Callable = validate_child
@@ -103,7 +104,7 @@ class Scenario:
 
                     new_root.append(child)
                     if child.tag == REST:
-                        self.rest_actions_number += 1
+                        self.rest_actions_info[child.attrib[NAME]] += 1
 
                 else:
                     for cycle in range(int(child.attrib[CYCLES])):

@@ -28,7 +28,8 @@ class StressTestPlayer:
 
     def run_player(self):
         """
-        Creates loop within given process worker, iterates over ITERATION NUMBER,
+        Creates loop within given process worker,
+         iterates over ITERATION NUMBER,
          user names and runs action coroutines
 
         :return:

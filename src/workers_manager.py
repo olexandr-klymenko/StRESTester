@@ -5,6 +5,7 @@ from typing import Iterable
 from xml.etree import ElementTree as ET
 
 from report import StressTestReport
+from scenario import Scenario
 from utils import progress_handler
 from utils import timeit_decorator
 from worker import process_worker
@@ -40,7 +41,7 @@ class StressTestProcess(Process):
 
 
 class WorkerManager:
-    def __init__(self, scenario: Iterable[ET.Element],
+    def __init__(self, scenario: Scenario,
                  workers_number: int,
                  total_actions: int):
 
@@ -107,5 +108,6 @@ class WorkerManager:
             for _, (__, process) in self._workers_info.items():
                 if process.is_alive():
                     process.terminate()
-            report = StressTestReport(self._report_metrics)
+            report = StressTestReport(self._report_metrics,
+                                      self._scenario.rest_actions_info)
             report.process_metrics()

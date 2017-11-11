@@ -12,7 +12,7 @@ from aiohttp.client_exceptions import ClientConnectorError, ClientOSError,\
 
 from action_registry.registry import register_action_decorator
 from codes_description import HTTPCodesDescription
-from constants import MAX_RETRY, RETRY_DELAY, REST_REQUEST_TIMEOUT,\
+from constants import MAX_RETRY, RETRY_DELAY, DEFAULT_REST_REQUEST_TIMEOUT,\
     IGNORE_ERRORS
 from counter import StatsCounter
 from utils import async_timeit_decorator, serialize
@@ -69,7 +69,7 @@ async def async_http_request(name, session: ClientSession, **kwargs) -> str:
     """
     _kwargs = serialize(kwargs)
     async with session.request(
-            timeout=REST_REQUEST_TIMEOUT,
+            timeout=DEFAULT_REST_REQUEST_TIMEOUT,
             **_kwargs) as resp:
         resp_data = await resp.text()
         description = HTTPCodesDescription.get_description(resp.status,

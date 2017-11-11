@@ -9,8 +9,9 @@ class StressTestReport:
     """
     Class for aggregation stress test metrics and report generation
     """
-    def __init__(self, metrics: List):
+    def __init__(self, metrics: List, rest_actions_info):
         self._metrics = metrics
+        self._rest_actions_info = rest_actions_info
 
     def process_metrics(self):
         am_sums = Counter()
@@ -28,7 +29,17 @@ class StressTestReport:
         print("Action metrics (averages):")
         pprint({metric: float(am_sums[metric])/am_counters[metric]
                 for metric in am_sums.keys()}, indent=4)
+
         print("Error metrics:")
-        pprint(dict(err_sums), indent=4)
+        pprint(
+            dict(
+                map(
+                    lambda t:
+                    (t[0], '%2.2f%%'
+                     % ((t[1] / self._rest_actions_info[t[0]]) * 100)),
+                    err_sums.items())
+            )
+            , indent=4
+        )
 
 # TODO implement JMEter like report

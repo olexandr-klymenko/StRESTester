@@ -23,7 +23,7 @@ SKIP_METRIC = 'skip_metric'
 
 MAX_RETRY = 10
 RETRY_DELAY = 1  # seconds
-REST_REQUEST_TIMEOUT = 10  # sec
+DEFAULT_REST_REQUEST_TIMEOUT = 1  # sec
 
 REQUEST_ARGS = ['url', 'method', 'data', 'params', 'headers']
 SERIALIZABLE_ARGS = ['data', 'params', 'headers']
