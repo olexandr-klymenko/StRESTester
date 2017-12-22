@@ -5,6 +5,7 @@ from concurrent.futures._base import TimeoutError
 from logging import getLogger
 from typing import Dict, Union
 import traceback
+from pprint import pprint
 
 from aiohttp import ClientSession
 from aiohttp.client_exceptions import ClientConnectorError, ClientOSError,\
@@ -55,6 +56,7 @@ async def async_rest_call(name, **kwargs) -> Union[str, bytes]:
             else:
                 return resp_data
 
+    pprint("name: %s\nkwargs: %s" % (name, kwargs), indent=4)
     raise Exception("Max number of retries exceeded")
 
 

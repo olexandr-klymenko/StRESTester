@@ -21,7 +21,7 @@ REPEAT = 'repeat'
 CYCLES = 'cycles'
 SKIP_METRIC = 'skip_metric'
 
-MAX_RETRY = 10
+MAX_RETRY = 100
 RETRY_DELAY = 1  # seconds
 DEFAULT_REST_REQUEST_TIMEOUT = 1  # sec
 
