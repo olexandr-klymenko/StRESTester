@@ -2,6 +2,7 @@ import asyncio
 from multiprocessing import Queue
 from typing import Dict, List, Iterable
 from xml.etree import ElementTree as ET
+import re
 
 from jinja2 import Template
 
@@ -10,6 +11,8 @@ from interfaces import BaseActionsRegistry
 from constants import *
 
 __all__ = ['StressTestPlayer']
+
+USER_ID_RE = re.compile("\d+")
 
 
 class StressTestPlayer:
@@ -38,6 +41,7 @@ class StressTestPlayer:
         for iteration in range(self._config[ITERATIONS_NUMBER]):
             for user_name in self._test_users:
                 scenario_kwargs = {
+                    'uid': self._get_user_id(user_name),
                     'username': user_name,
                     'password': TEST_USER_PASSWORD
                 }
@@ -45,6 +49,10 @@ class StressTestPlayer:
                 scenario_kwargs.update(self._config)
                 loop.run_until_complete(
                     self._parse_scenario_template(scenario_kwargs))
+
+    @staticmethod
+    def _get_user_id(username):
+        return re.search(USER_ID_RE, username).group(0)
 
     async def _parse_scenario_template(self, scenario_kwargs: Dict):
         """
