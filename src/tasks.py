@@ -1,6 +1,7 @@
 import logging
 import os
 import sys
+from xml.etree import ElementTree as ET
 
 from invoke import task
 
@@ -25,7 +26,7 @@ logger.setLevel(os.environ.get('LOG_LEVEL') or logging.INFO)
 @task
 def run(_, scenario, config):
     logger.info("Starting '%s' version %s ..." % (PROJECT, version))
-    scenario_obj = Scenario(path=scenario)
+    scenario_obj = Scenario(xml_root=ET.parse(open(scenario)).getroot())
 
     cfg = StressTestConfig(config)
     os.environ[ST_CONFIG_PATH] = config

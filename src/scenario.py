@@ -1,8 +1,8 @@
+from collections import defaultdict
 from copy import deepcopy
 from pprint import pprint
-from xml.etree import ElementTree as ET
 from typing import List, Callable
-from collections import defaultdict
+from xml.etree import ElementTree as ET
 
 from action_registry.registry import ActionsRegistry
 from constants import *
@@ -65,13 +65,11 @@ class Scenario:
     _validated_steps = []
     rest_actions_info = defaultdict(int)
 
-    def __init__(self, path: str,
+    def __init__(self, xml_root: ET.Element,
                  validator: Callable = validate_child
                  ):
-        with open(path) as f:
-            _root = ET.parse(f).getroot()
         self._validator = validator
-        self._root = self._parse(_root)
+        self._root = self._parse(xml_root)
 
     def __call__(self, *args, **kwargs) -> ET.Element:
         return self._root
@@ -91,7 +89,7 @@ class Scenario:
         """
         new_root = ET.Element('scenario')
 
-        def _parse_root(root: ET.Element=raw_root) -> ET.Element:
+        def _parse_root(root: ET.Element = raw_root) -> ET.Element:
             nonlocal new_root
 
             for child in root:
