@@ -1,14 +1,14 @@
 import asyncio
-from multiprocessing import Queue
-from typing import Dict, List, Iterable
-from xml.etree import ElementTree as ET
 import re
+from multiprocessing import Queue
+from typing import Dict, Iterable
+from xml.etree import ElementTree as ET
 
 from jinja2 import Template
 
 from action_registry.registry import ActionsRegistry
-from interfaces import BaseActionsRegistry
 from constants import *
+from interfaces import BaseActionsRegistry
 
 __all__ = ['StressTestPlayer']
 
@@ -19,13 +19,13 @@ class StressTestPlayer:
     def __init__(self,
                  config: Dict,
                  scenario: Iterable[ET.Element],
-                 test_users: List,
+                 test_user: str,
                  progress_queue: Queue,
-                 act_registry: BaseActionsRegistry=ActionsRegistry):
+                 act_registry: BaseActionsRegistry = ActionsRegistry):
 
         self._config = config
         self._scenario = scenario
-        self._test_users = test_users
+        self._test_user = test_user
         self._progress_queue = progress_queue
         self._action_registry = act_registry
 
@@ -39,16 +39,15 @@ class StressTestPlayer:
         """
         loop = asyncio.get_event_loop()
         for iteration in range(self._config[ITERATIONS_NUMBER]):
-            for user_name in self._test_users:
-                scenario_kwargs = {
-                    'uid': self._get_user_id(user_name),
-                    'username': user_name,
-                    'password': TEST_USER_PASSWORD
-                }
-                scenario_kwargs.update(self._config[URLS])
-                scenario_kwargs.update(self._config)
-                loop.run_until_complete(
-                    self._parse_scenario_template(scenario_kwargs))
+            scenario_kwargs = {
+                'uid': self._get_user_id(self._test_user),
+                'username': self._test_user,
+                'password': TEST_USER_PASSWORD
+            }
+            scenario_kwargs.update(self._config[URLS])
+            scenario_kwargs.update(self._config)
+            loop.run_until_complete(
+                self._parse_scenario_template(scenario_kwargs))
 
     @staticmethod
     def _get_user_id(username):
@@ -77,7 +76,7 @@ class StressTestPlayer:
 
             for node in child:
                 try:
-                    parsed_kwargs[node.tag] =\
+                    parsed_kwargs[node.tag] = \
                         Template(node.text).render(**scenario_kwargs)
 
                 except (NameError, SyntaxError):

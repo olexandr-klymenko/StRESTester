@@ -1,19 +1,18 @@
-import os
 from multiprocessing import connection, Queue
-from typing import List, Iterable
+from typing import Iterable
 from xml.etree import ElementTree as ET
 
-from codes_description import HTTPCodesDescription
 from configure_logging import configure_logging
-from constants import ST_CONFIG_PATH, TEST_USER_NAME, USERS_NUMBER
+from constants import TEST_USER_NAME
 from counter import StatsCounter
+from interfaces import BaseStressTestConfig
 from player import StressTestPlayer
-from stress_test_config import StressTestConfig
 
 configure_logging()
 
 
 def process_worker(worker_index: int,
+                   cfg: BaseStressTestConfig,
                    scenario: Iterable[ET.Element],
                    conn: connection,
                    progress_queue: Queue):
@@ -22,20 +21,16 @@ def process_worker(worker_index: int,
      as a target within multiprocessing.Process
 
     :param worker_index:
+    :param cfg:
     :param scenario:
     :param conn:
     :param progress_queue:
     :return:
     """
-    config_path = os.environ[ST_CONFIG_PATH]
-    _config = StressTestConfig(config_path)
-    HTTPCodesDescription.init(_config, False)
 
-    test_users = _get_users(_config[USERS_NUMBER], worker_index)
-
-    player = StressTestPlayer(config=_config,
+    player = StressTestPlayer(config=cfg,
                               scenario=scenario,
-                              test_users=test_users,
+                              test_user=f"{TEST_USER_NAME}_{worker_index}",
                               progress_queue=progress_queue)
     try:
         player.run_player()
@@ -43,16 +38,3 @@ def process_worker(worker_index: int,
     finally:
         conn.send((StatsCounter.get_averages(),
                    dict(StatsCounter.get_errors())))
-
-
-def _get_users(users_number, worker_index) -> List:
-    """
-    It figures out the list of users for given worker
-
-    :param users_number:
-    :param worker_index:
-    :return: list of user names
-    """
-    return ["%s_%s" % (TEST_USER_NAME, idx)
-            for idx in range((worker_index - 1) * users_number,
-                             users_number * worker_index)]

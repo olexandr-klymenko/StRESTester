@@ -11,10 +11,10 @@ __all__ = ['StressTestConfig']
 logger = getLogger(__name__)
 
 
+DEPRECATED_FIELDS = ['users_number']
+
+
 class StressTestConfig(BaseStressTestConfig):
-    def __init__(self, config):
-        super().__init__(config)
-        self._validate_config()
 
     @staticmethod
     def _read_config(config):
@@ -22,6 +22,12 @@ class StressTestConfig(BaseStressTestConfig):
             return json.load(config_file)
 
     def _validate_config(self):
+        if set(DEPRECATED_FIELDS).issubset(set(self._config)):
+            logger.warning(
+                f"There are at least one deprecated filed in the config:"
+                f" {set(self._config) & set(DEPRECATED_FIELDS)}"
+            )
+
         if not set(MANDATORY_CONFIG_FIELDS).issubset(set(self._config)):
             raise Exception("Config file is not complete")
 

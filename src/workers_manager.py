@@ -1,11 +1,11 @@
 import traceback
 from logging import getLogger
 from multiprocessing import Queue, Process, Pipe
-from typing import Iterable
-from xml.etree import ElementTree as ET
 
+from constants import WORKERS_NUMBER
 from report import StressTestReport
 from scenario import Scenario
+from interfaces import BaseStressTestConfig
 from utils import progress_handler
 from utils import timeit_decorator
 from worker import process_worker
@@ -42,11 +42,11 @@ class StressTestProcess(Process):
 
 class WorkerManager:
     def __init__(self, scenario: Scenario,
-                 workers_number: int,
+                 cfg: BaseStressTestConfig,
                  total_actions: int):
 
         self._scenario = scenario
-        self._workers_number = workers_number
+        self._cfg = cfg
         self._total_actions = total_actions
         self._workers_info = {}
         self._report_metrics = []
@@ -71,11 +71,12 @@ class WorkerManager:
         self._progress_process.start()
 
     def _init_workers(self):
-        for index in range(1, self._workers_number + 1):
+        for index in range(1, self._cfg[WORKERS_NUMBER] + 1):
             parent_conn, child_conn = Pipe()
             self._workers_info[index] = \
                 parent_conn, StressTestProcess(target=process_worker,
                                                args=(index,
+                                                     self._cfg,
                                                      self._scenario,
                                                      child_conn,
                                                      self._progress_queue))

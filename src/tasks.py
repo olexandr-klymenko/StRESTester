@@ -31,10 +31,7 @@ def run(_, scenario, config):
     cfg = StressTestConfig(config)
     os.environ[ST_CONFIG_PATH] = config
 
-    scenario_iterations = \
-        cfg[WORKERS_NUMBER] *\
-        cfg[USERS_NUMBER] *\
-        cfg[ITERATIONS_NUMBER]
+    scenario_iterations = cfg[WORKERS_NUMBER] * cfg[ITERATIONS_NUMBER]
 
     rest_actions =\
         sum(scenario_obj.rest_actions_info.values()) * scenario_iterations
@@ -42,7 +39,7 @@ def run(_, scenario, config):
     total_actions = len(scenario_obj) * scenario_iterations
 
     workers_manager = WorkerManager(scenario_obj,
-                                    cfg[WORKERS_NUMBER],
+                                    cfg,
                                     total_actions)
     workers_manager.run_stress_test(rest_actions=rest_actions)
 
