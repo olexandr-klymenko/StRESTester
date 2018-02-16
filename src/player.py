@@ -29,6 +29,17 @@ class StressTestPlayer:
         self._progress_queue = progress_queue
         self._action_registry = act_registry
 
+    def collect_coros(self):
+        for iteration in range(self._config[ITERATIONS_NUMBER]):
+            scenario_kwargs = {
+                'uid': self._get_user_id(self._test_user),
+                'username': self._test_user,
+                'password': TEST_USER_PASSWORD
+            }
+            scenario_kwargs.update(self._config[URLS])
+            scenario_kwargs.update(self._config)
+            yield self._parse_scenario_template(scenario_kwargs)
+
     def run_player(self):
         """
         Creates loop within given process worker,
@@ -38,16 +49,8 @@ class StressTestPlayer:
         :return:
         """
         loop = asyncio.get_event_loop()
-        for iteration in range(self._config[ITERATIONS_NUMBER]):
-            scenario_kwargs = {
-                'uid': self._get_user_id(self._test_user),
-                'username': self._test_user,
-                'password': TEST_USER_PASSWORD
-            }
-            scenario_kwargs.update(self._config[URLS])
-            scenario_kwargs.update(self._config)
-            loop.run_until_complete(
-                self._parse_scenario_template(scenario_kwargs))
+        for coro in self.collect_coros():
+            loop.run_until_complete(coro)
 
     @staticmethod
     def _get_user_id(username):
